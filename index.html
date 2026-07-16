@@ -281,10 +281,30 @@
   .a-spider svg { animation:spiderbob 2.2s ease-in-out infinite; }
   @keyframes spiderbob { 50% { transform:translateY(5px); } }
 
+  /* ---------- bus world ---------- */
+  .bus-row { display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:6px; row-gap:14px; }
+  .bus-row .arrow { font-size:clamp(18px,4.5vw,26px); font-weight:bold; color:#b8741a; }
+  .bus-chip {
+    min-width:min(74px,17vw); height:min(64px,15vw); padding:0 12px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center; white-space:nowrap;
+    font-size:clamp(18px,4.6vw,26px); font-weight:bold; color:#6b4200;
+    background:linear-gradient(180deg,#ffe08a,#ffc93c); border:3px solid #d69515;
+    box-shadow:inset 0 -5px 0 rgba(0,0,0,.08);
+  }
+  .bus-chip.missing { background:#fff; color:#e2544a; border:3px dashed #e2544a; }
+  .knight.as-bus { width:78px; height:48px; }
+  .bus-wheel { transform-box:fill-box; transform-origin:center; animation:wheelspin 1.1s linear infinite; }
+  @keyframes wheelspin { to { transform:rotate(360deg); } }
+  .a-cow svg { animation:crocrock 2.6s ease-in-out infinite; }
+  .tl-red { animation:blinkred 1.4s infinite; }
+  @keyframes blinkred { 50% { opacity:.3; } }
+
+  #ov-text { white-space:pre-line; }
+
   /* task entrance + answer reveal */
   @keyframes appear { from { transform:scale(0); opacity:0; } to { transform:scale(1); opacity:1; } }
-  .brick, .snake .seg, .snake .op, .snake .arrow, .snake-emoji, .eq .chip, .eq-equals { animation:appear .35s ease backwards; }
-  .brick.missing, .snake .seg.missing, .eq .chip.missing { animation:appear .35s ease backwards, pulse 1.2s .45s infinite; }
+  .brick, .snake .seg, .snake .op, .snake .arrow, .snake-emoji, .eq .chip, .eq-equals, .bus-chip, .bus-row .arrow { animation:appear .35s ease backwards; }
+  .brick.missing, .snake .seg.missing, .eq .chip.missing, .bus-chip.missing { animation:appear .35s ease backwards, pulse 1.2s .45s infinite; }
   .choice { animation:appear .3s ease backwards; }
   .solved {
     background:linear-gradient(180deg,#b6f0a0,#6fce58) !important;
@@ -306,6 +326,61 @@
   .map-node:nth-of-type(1) { animation-delay:.05s; }
   .map-node:nth-of-type(2) { animation-delay:.16s; }
   .map-node:nth-of-type(3) { animation-delay:.27s; }
+  .map-node:nth-of-type(4) { animation-delay:.38s; }
+
+  /* map hud row */
+  .map-hud { display:flex; gap:10px; align-items:center; margin-bottom:14px; flex-wrap:wrap; justify-content:center; }
+  .map-hud .gem-total { margin-bottom:0; }
+  .shard-chip { display:flex; align-items:center; gap:6px; }
+  .shard-chip svg { height:26px; width:auto; vertical-align:middle; }
+  .stats-btn { font-size:16px; padding:5px 12px; }
+
+  /* parallax background layer */
+  .bg-layer { position:absolute; inset:0; width:calc(100% + 48px); height:100%; transition:transform .7s ease; }
+  .bg-layer .scene-bg { width:100%; height:100%; }
+
+  /* ambient particles */
+  .amb { position:absolute; top:-16px; font-size:13px; opacity:.85; pointer-events:none; z-index:2;
+    animation:ambfall linear infinite; }
+  @keyframes ambfall { from { transform:translateY(0) rotate(0deg); } to { transform:translateY(170px) rotate(220deg); } }
+  .amb.amb-rise { top:auto; bottom:-4px; animation:ambrise linear infinite; }
+  @keyframes ambrise { from { transform:translateY(0); opacity:.9; } to { transform:translateY(-160px); opacity:0; } }
+
+  /* dragon speech bubble */
+  .bubble {
+    position:absolute; top:24px; right:4%; max-width:190px; z-index:8;
+    background:#fffef5; border:2px solid #8a5fc0; border-radius:14px;
+    padding:6px 12px; font-size:14px; font-weight:bold; color:#3d1f66;
+    box-shadow:0 4px 10px rgba(0,0,0,.3);
+    animation:bubblelife 2s ease forwards;
+  }
+  .bubble::after { content:''; position:absolute; bottom:-9px; right:26px;
+    border:5px solid transparent; border-top-color:#8a5fc0; }
+  @keyframes bubblelife { 0%{transform:scale(0); opacity:0;} 12%{transform:scale(1.06); opacity:1;} 18%{transform:scale(1);} 85%{opacity:1;} 100%{opacity:0;} }
+
+  /* owl hint bubble */
+  .hint-bubble {
+    background:#fffef5; border:3px solid #ffd94d; border-radius:16px;
+    padding:8px 16px; font-size:clamp(14px,3.4vw,17px); font-weight:bold; color:#5c4a10;
+    max-width:560px; animation:appear .3s ease; box-shadow:0 4px 10px rgba(0,0,0,.15);
+  }
+
+  /* dragon fatigue + defeat */
+  .smoke { position:absolute; right:24%; bottom:70px; font-size:18px; z-index:4; opacity:.8;
+    animation:ambrise 2.4s linear infinite; }
+  .boss-dragon.tired { animation:tiredhover 4s ease-in-out infinite; }
+  @keyframes tiredhover { 0%,100% { transform:translateY(4px) rotate(4deg); } 50% { transform:translateY(8px) rotate(5deg); } }
+  .boss-dragon.defeated { animation:dragonout 1.3s ease forwards !important; }
+  @keyframes dragonout {
+    25% { transform:translateY(-24px) rotate(-25deg); opacity:1; }
+    100% { transform:translateY(-190px) rotate(360deg) scale(.5); opacity:0; }
+  }
+  .scene.shake { animation:shake .4s; }
+
+  /* story stage in overlay panel */
+  #ov-stage { display:none; margin:0 auto 8px; }
+  #ov-stage svg { height:120px; width:auto; max-width:100%; display:block; margin:0 auto;
+    filter:drop-shadow(0 6px 8px rgba(0,0,0,.2)); animation:appear .4s ease; }
 </style>
 </head>
 <body>
@@ -324,7 +399,11 @@
 <!-- ============ MAP ============ -->
 <div id="screen-map" class="screen">
   <h2>Mapa království</h2>
-  <div class="gem-total">💎 <span id="total-gems">0</span> drahokamů</div>
+  <div class="map-hud">
+    <div class="gem-total">💎 <span id="total-gems">0</span> drahokamů</div>
+    <div class="gem-total shard-chip"><span id="shard-view"></span> křišťál</div>
+    <button class="icon-btn stats-btn" onclick="showStats()">📊</button>
+  </div>
   <div class="map-wrap">
     <svg class="map-bg" viewBox="0 0 900 560" preserveAspectRatio="none">
       <defs>
@@ -365,6 +444,12 @@
       <div class="medals" id="medals-had"></div>
       <div class="lvl" id="map-lvl-had"></div>
     </div>
+    <div class="map-node" style="left:33%; top:60%;" onclick="openWorld('bus')">
+      <div class="node-icon"><svg viewBox="0 0 96 56"><rect x="2" y="6" width="90" height="36" rx="10" fill="#ffc93c"/><rect x="2" y="28" width="90" height="10" fill="#f0a500"/><rect x="10" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="28" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="46" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="66" y="12" width="20" height="26" rx="4" fill="#8fd0ff"/><circle cx="24" cy="44" r="9" fill="#333"/><circle cx="24" cy="44" r="4.5" fill="#999"/><circle cx="70" cy="44" r="9" fill="#333"/><circle cx="70" cy="44" r="4.5" fill="#999"/></svg></div>
+      <h3>Kouzelný autobus</h3>
+      <div class="medals" id="medals-bus"></div>
+      <div class="lvl" id="map-lvl-bus"></div>
+    </div>
     <div class="map-node" id="tower-card" style="left:82%; top:21%;" onclick="openTower()">
       <div class="node-icon"><svg viewBox="0 0 80 72"><rect x="24" y="20" width="32" height="48" rx="4" fill="#9aa3ad"/><rect x="22" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="36" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="50" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="34" y="46" width="12" height="22" rx="6" fill="#4a3a5a"/><rect x="37" y="2" width="2.5" height="14" fill="#8a5a2b"/><path d="M39.5 2 h13 l-4 4 4 4 h-13 Z" fill="#5b2d91"/><circle cx="40" cy="34" r="5" fill="#2b3a55"/><circle cx="40" cy="34" r="3" fill="#7ee0e8"/></svg></div>
       <h3>Dračí věž</h3>
@@ -388,6 +473,7 @@
     <span id="instruction-text"></span>
   </div>
   <div id="task-area"></div>
+  <div id="hint-bubble" class="hint-bubble" style="display:none;"></div>
   <div class="choices" id="choices"></div>
 </div>
 
@@ -396,6 +482,7 @@
 <!-- ============ OVERLAY ============ -->
 <div id="overlay">
   <div class="panel">
+    <div id="ov-stage"></div>
     <div class="big-emoji" id="ov-emoji">🐉</div>
     <h3 id="ov-title"></h3>
     <p id="ov-text"></p>
@@ -449,18 +536,35 @@ const DRAGON_SVG = `<svg viewBox="0 0 100 84" xmlns="http://www.w3.org/2000/svg"
 
 const SPARK_SVG = `<svg viewBox="0 0 40 40"><path d="M20 0 L24 14 L40 20 L24 26 L20 40 L16 26 L0 20 L16 14 Z" fill="#ffd94d"/><circle cx="20" cy="20" r="5" fill="#fff"/></svg>`;
 
+const BUS_SVG = `<svg viewBox="0 0 96 56" xmlns="http://www.w3.org/2000/svg">
+<rect x="2" y="6" width="90" height="36" rx="10" fill="#ffc93c"/>
+<rect x="2" y="28" width="90" height="10" fill="#f0a500"/>
+<rect x="10" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
+<rect x="28" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
+<rect x="46" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
+<rect x="66" y="12" width="20" height="26" rx="4" fill="#8fd0ff"/>
+<rect x="66" y="12" width="20" height="26" rx="4" fill="none" stroke="#d69515" stroke-width="2"/>
+<circle cx="90" cy="34" r="3.5" fill="#fff3b0"/>
+<g class="bus-wheel"><circle cx="24" cy="44" r="9" fill="#333"/><circle cx="24" cy="44" r="4.5" fill="#999"/><path d="M24 36 v16 M16 44 h16" stroke="#666" stroke-width="2"/></g>
+<g class="bus-wheel"><circle cx="70" cy="44" r="9" fill="#333"/><circle cx="70" cy="44" r="4.5" fill="#999"/><path d="M70 36 v16 M62 44 h16" stroke="#666" stroke-width="2"/></g>
+</svg>`;
+
 const OBS_SVG = {
 troll:`<svg viewBox="0 0 64 64"><rect x="44" y="18" width="8" height="34" rx="4" fill="#8a5a2b" transform="rotate(18 48 35)"/><circle cx="48" cy="16" r="7" fill="#7a4a1f"/><ellipse cx="30" cy="42" rx="19" ry="17" fill="#6da84e"/><circle cx="16" cy="22" r="4" fill="#7cbf5a"/><circle cx="44" cy="22" r="4" fill="#7cbf5a"/><circle cx="30" cy="22" r="13" fill="#7cbf5a"/><circle cx="25" cy="20" r="4" fill="#fff"/><circle cx="35" cy="20" r="4" fill="#fff"/><circle cx="26" cy="21" r="2" fill="#222"/><circle cx="34" cy="21" r="2" fill="#222"/><path d="M20 13 l8 4 M40 13 l-8 4" stroke="#3f6f2a" stroke-width="2.5" stroke-linecap="round"/><path d="M23 29 q7 5 14 0 Z" fill="#4a3020"/><rect x="25" y="28" width="4" height="4" rx="1" fill="#fff"/><rect x="31" y="28" width="4" height="4" rx="1" fill="#fff"/></svg>`,
 boulder:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="57" rx="22" ry="4" fill="#000" opacity=".13"/><path d="M12 50 Q6 30 20 20 Q34 8 48 20 Q60 30 54 46 Q48 58 30 56 Q16 56 12 50 Z" fill="#9aa3ad"/><path d="M22 24 L34 30 L30 42" stroke="#7c858f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 22 L44 34" stroke="#7c858f" stroke-width="3" stroke-linecap="round"/></svg>`,
 eagle:`<svg viewBox="0 0 64 64"><path d="M6 20 Q20 6 32 22 Q44 6 58 20 Q44 22 36 28 Q30 32 28 28 Q20 22 6 20 Z" fill="#8a5a2b"/><ellipse cx="32" cy="36" rx="10" ry="13" fill="#a06a35"/><circle cx="32" cy="22" r="8" fill="#f4f0e6"/><circle cx="34.5" cy="21" r="1.8" fill="#222"/><path d="M39 23 l7 2.5 -7 2.5 Z" fill="#e8a423"/><path d="M26 48 l3 6 M32 49 l0 7 M38 48 l-3 6" stroke="#e8a423" stroke-width="2.5" stroke-linecap="round"/></svg>`,
 croc:`<svg viewBox="0 0 64 64"><ellipse cx="40" cy="44" rx="20" ry="12" fill="#4e9b47"/><path d="M56 40 q8 -6 6 -14 q-6 4 -10 8 Z" fill="#4e9b47"/><ellipse cx="18" cy="40" rx="16" ry="8" fill="#5fae55"/><path d="M8 44 l3 -4 3 4 3 -4 3 4 3 -4 3 4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="#5fae55"/><circle cx="30" cy="29" r="2" fill="#222"/><path d="M30 38 l4 -5 4 5 4 -5 4 5" fill="#3c7a36"/><path d="M34 52 l2 6 M44 52 l0 7 M52 48 l3 6" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/></svg>`,
 river:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="46" rx="28" ry="14" fill="#4aa8e8"/><path d="M8 44 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0" stroke="#bfe4ff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 52 q5 -4 10 0 q5 4 10 0 q5 -4 10 0" stroke="#8fd0ff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M26 28 q6 -12 12 0 q-6 -4 -12 0 Z" fill="#4aa8e8" opacity=".8"/></svg>`,
-spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v24" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`
+spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v24" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`,
+cow:`<svg viewBox="0 0 64 64"><ellipse cx="36" cy="40" rx="20" ry="13" fill="#f4f0e6"/><ellipse cx="30" cy="35" rx="6" ry="4.5" fill="#4a3a2a"/><ellipse cx="46" cy="44" rx="5.5" ry="4" fill="#4a3a2a"/><path d="M28 51 v7 M36 52 v7 M44 51 v7 M52 48 v7" stroke="#d8cdb8" stroke-width="4" stroke-linecap="round"/><circle cx="15" cy="29" r="9.5" fill="#f4f0e6"/><path d="M7 22 q-5 -5 1 -8 M23 22 q5 -5 -1 -8" stroke="#d8cdb8" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="13" cy="34" rx="5.5" ry="4" fill="#f2b8c6"/><circle cx="11" cy="26" r="1.6" fill="#222"/><circle cx="18" cy="26" r="1.6" fill="#222"/></svg>`,
+cone:`<svg viewBox="0 0 64 64"><path d="M32 10 L45 52 H19 Z" fill="#ff8c42"/><path d="M27 30 h10 M23 42 h18" stroke="#fff" stroke-width="5" stroke-linecap="round"/><rect x="10" y="52" width="44" height="7" rx="3.5" fill="#e8632a"/><circle cx="32" cy="10" r="3.5" fill="#e8632a"/></svg>`,
+light:`<svg viewBox="0 0 64 64"><rect x="29" y="28" width="6" height="32" rx="3" fill="#556070"/><rect x="19" y="2" width="26" height="32" rx="8" fill="#333a4a"/><circle class="tl-red" cx="32" cy="12" r="5.5" fill="#ff5a4e"/><circle cx="32" cy="25" r="5.5" fill="#2a5a2a"/></svg>`
 };
 
 const GOAL_SVG = {
 pyr:`<svg viewBox="0 0 48 64"><rect x="21" y="8" width="4" height="52" rx="2" fill="#8a5a2b"/><path d="M25 8 h20 l-6 8 6 8 h-20 Z" fill="#e2544a"/><circle cx="23" cy="6" r="4" fill="#ffd94d"/></svg>`,
-had:`<svg viewBox="0 0 64 56"><circle cx="20" cy="16" r="3" fill="#7ee0e8"/><circle cx="44" cy="14" r="3" fill="#f78fb3"/><circle cx="32" cy="10" r="3" fill="#9ff0a0"/><rect x="8" y="22" width="48" height="28" rx="6" fill="#8a5a2b"/><path d="M8 30 a24 14 0 0 1 48 0 v2 h-48 Z" fill="#a06a35"/><rect x="8" y="30" width="48" height="5" fill="#6b4423"/><rect x="27" y="27" width="10" height="12" rx="2" fill="#ffd94d"/><circle cx="32" cy="34" r="2" fill="#8a5a2b"/></svg>`
+had:`<svg viewBox="0 0 64 56"><circle cx="20" cy="16" r="3" fill="#7ee0e8"/><circle cx="44" cy="14" r="3" fill="#f78fb3"/><circle cx="32" cy="10" r="3" fill="#9ff0a0"/><rect x="8" y="22" width="48" height="28" rx="6" fill="#8a5a2b"/><path d="M8 30 a24 14 0 0 1 48 0 v2 h-48 Z" fill="#a06a35"/><rect x="8" y="30" width="48" height="5" fill="#6b4423"/><rect x="27" y="27" width="10" height="12" rx="2" fill="#ffd94d"/><circle cx="32" cy="34" r="2" fill="#8a5a2b"/></svg>`,
+bus:`<svg viewBox="0 0 48 64"><rect x="21" y="6" width="4" height="54" rx="2" fill="#8a5a2b"/><rect x="25" y="6" width="20" height="16" fill="#fff"/><path fill="#222" d="M25 6 h5 v4 h-5 Z M35 6 h5 v4 h-5 Z M30 10 h5 v4 h-5 Z M40 10 h5 v4 h-5 Z M25 14 h5 v4 h-5 Z M35 14 h5 v4 h-5 Z M30 18 h5 v4 h-5 Z M40 18 h5 v4 h-5 Z"/></svg>`
 };
 
 const SCENE_BG = {
@@ -486,6 +590,26 @@ had:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
 <rect y="94" width="640" height="46" fill="#79b95c"/>
 <rect y="94" width="640" height="6" fill="#61a047"/>
 </svg>`,
+bus:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
+<defs><linearGradient id="skyB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff"/><stop offset="1" stop-color="#e8f2fc"/></linearGradient></defs>
+<rect width="640" height="140" fill="url(#skyB)"/>
+<circle cx="580" cy="24" r="15" fill="#ffd94d"/>
+<rect x="20" y="40" width="70" height="56" rx="4" fill="#b3c4d8"/>
+<rect x="120" y="26" width="60" height="70" rx="4" fill="#9fb2c8"/>
+<rect x="210" y="48" width="80" height="48" rx="4" fill="#c4d2e2"/>
+<rect x="330" y="32" width="64" height="64" rx="4" fill="#9fb2c8"/>
+<rect x="430" y="50" width="76" height="46" rx="4" fill="#b3c4d8"/>
+<rect x="540" y="38" width="66" height="58" rx="4" fill="#c4d2e2"/>
+<g fill="#ffd94d" opacity=".85">
+<rect x="32" y="50" width="10" height="10" rx="2"/><rect x="56" y="50" width="10" height="10" rx="2"/><rect x="32" y="70" width="10" height="10" rx="2"/>
+<rect x="132" y="38" width="9" height="9" rx="2"/><rect x="152" y="38" width="9" height="9" rx="2"/><rect x="132" y="58" width="9" height="9" rx="2"/><rect x="152" y="58" width="9" height="9" rx="2"/>
+<rect x="344" y="44" width="9" height="9" rx="2"/><rect x="364" y="44" width="9" height="9" rx="2"/><rect x="344" y="64" width="9" height="9" rx="2"/>
+<rect x="554" y="50" width="10" height="10" rx="2"/><rect x="578" y="50" width="10" height="10" rx="2"/>
+</g>
+<rect y="96" width="640" height="44" fill="#8b8f98"/>
+<rect y="96" width="640" height="5" fill="#6f747e"/>
+<path d="M0 120 h640" stroke="#fff" stroke-width="3" stroke-dasharray="18 14" opacity=".65"/>
+</svg>`,
 drak:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
 <defs><linearGradient id="skyD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241f3d"/><stop offset="1" stop-color="#5a4a86"/></linearGradient></defs>
 <rect width="640" height="140" fill="url(#skyD)"/>
@@ -508,22 +632,42 @@ const FLAME_SVG = `<svg viewBox="0 0 40 24"><path d="M40 12 Q26 2 2 8 Q10 12 2 1
 
 /* ================= state ================= */
 const DEFAULT_STATE = {
-  gems:{pyr:0, had:0},
-  level:{pyr:1, had:1},
-  streak:{pyr:0, had:0},
-  failStreak:{pyr:0, had:0},
-  medalsShown:{pyr:0, had:0},
-  worldIntro:{pyr:false, had:false},
+  gems:{pyr:0, had:0, bus:0},
+  level:{pyr:1, had:1, bus:1},
+  streak:{pyr:0, had:0, bus:0},
+  failStreak:{pyr:0, had:0, bus:0},
+  medalsShown:{pyr:0, had:0, bus:0},
+  worldIntro:{pyr:false, had:false, bus:false},
+  stats:{
+    pyr:{solved:0, firstTry:0, misses:0, maxLevel:1},
+    had:{solved:0, firstTry:0, misses:0, maxLevel:1},
+    bus:{solved:0, firstTry:0, misses:0, maxLevel:1},
+    drak:{solved:0, firstTry:0, misses:0, wins:0}
+  },
   introSeen:false,
   dragonBeaten:false
 };
 let S = loadState();
 function loadState(){
+  const st = JSON.parse(JSON.stringify(DEFAULT_STATE));
   try {
     const raw = localStorage.getItem('rytirCisel');
-    if (raw) return Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE)), JSON.parse(raw));
+    if (raw){
+      const saved = JSON.parse(raw);
+      // deep-merge one level so saves from older versions keep their
+      // progress but gain the new worlds' default keys
+      for (const k of Object.keys(st)){
+        if (saved[k] === undefined) continue;
+        if (st[k] && typeof st[k] === 'object'){
+          for (const k2 of Object.keys(saved[k]||{})){
+            if (st[k][k2] && typeof st[k][k2] === 'object') Object.assign(st[k][k2], saved[k][k2]);
+            else st[k][k2] = saved[k][k2];
+          }
+        } else st[k] = saved[k];
+      }
+    }
   } catch(e){}
-  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+  return st;
 }
 function saveState(){ try { localStorage.setItem('rytirCisel', JSON.stringify(S)); } catch(e){} }
 function resetProgress(){
@@ -595,40 +739,118 @@ function show(id){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+function shardCount(){
+  return ['pyr','had','bus'].filter(w => S.medalsShown[w] >= 1).length;
+}
+function crystalSVG(shards){
+  const cols = ['#5bc0eb','#7cc24e','#ffc93c'];
+  const on = i => i < shards ? cols[i] : '#d5dce6';
+  return '<svg viewBox="0 0 100 100">' +
+    '<path d="M50 6 L78 40 L50 60 Z" fill="' + on(0) + '"/>' +
+    '<path d="M78 40 L50 60 L66 94 Z" fill="' + on(1) + '"/>' +
+    '<path d="M22 40 L50 6 L50 60 L34 94 Z" fill="' + on(2) + '"/>' +
+    '<path d="M50 6 L78 40 L66 94 L34 94 L22 40 Z" fill="none" stroke="#8fa8c4" stroke-width="3" stroke-linejoin="round"/>' +
+    '</svg>';
+}
+const CASTLE_SVG = `<svg viewBox="0 0 140 100">
+<circle cx="118" cy="18" r="12" fill="#ffd94d"/>
+<rect x="20" y="34" width="18" height="60" fill="#b3c4d8"/>
+<path d="M20 34 h4 v-6 h4 v6 h4 v-6 h4 v6 h2 v8 h-18 Z" fill="#9fb2c8"/>
+<rect x="100" y="34" width="18" height="60" fill="#b3c4d8"/>
+<path d="M100 34 h4 v-6 h4 v6 h4 v-6 h4 v6 h2 v8 h-18 Z" fill="#9fb2c8"/>
+<rect x="38" y="52" width="62" height="42" fill="#c4d2e2"/>
+<path d="M38 52 h6 v-6 h6 v6 h6 v-6 h6 v6 h6 v-6 h6 v6 h6 v-6 h6 v6 h6 v-6 h6 v6 h2 v8 h-62 Z" fill="#9fb2c8"/>
+<path d="M60 94 v-22 a9 9 0 0 1 18 0 v22 Z" fill="#4a3a5a"/>
+<rect x="26" y="14" width="2.5" height="22" fill="#8a5a2b"/><path d="M28.5 14 h12 l-4 4 4 4 h-12 Z" fill="#e2544a"/>
+<rect x="106" y="14" width="2.5" height="22" fill="#8a5a2b"/><path d="M108.5 14 h12 l-4 4 4 4 h-12 Z" fill="#e2544a"/>
+<text x="52" y="40" font-size="14" fill="#ffd94d" font-weight="bold">1 2 3</text>
+</svg>`;
+const INTRO_STORY = [
+  { title:'Číselné království',
+    text:'V Číselném království zářil kouzelný Křišťál čísel a všechna čísla žila šťastně.',
+    stage:CASTLE_SVG },
+  { title:'Drak Chaos!',
+    text:'Ale zlý drak Chaos křišťál ukradl a rozbil na tři střepy! Ukryl je na Pyramidové hoře, v Hadím údolí a v Kouzelném autobuse.',
+    stage:DRAGON_SVG },
+  { title:'Tvůj úkol, rytíři',
+    text:'Získej v každém světě medaili a najdi všechny tři střepy. Až křišťál složíš, otevře se Dračí věž — a draka porazíš!',
+    stage:KNIGHT_SVG, btn:'Vyrážím!' }
+];
+function showStory(panels, onDone){
+  let i = 0;
+  const next = () => {
+    const p = panels[i];
+    const last = i === panels.length - 1;
+    showPanel('', p.title, p.text, last ? (p.btn || 'Pokračovat') : 'Dál ➜', () => {
+      i++;
+      if (i < panels.length) next();
+      else if (onDone) onDone();
+    }, true, p.stage);
+  };
+  next();
+}
 function startGame(){
   ensureAudio(); playClick();
   if (!S.introSeen){
-    showPanel('🐉','Drak Chaos!',
-      'Zlý drak Chaos ukradl království kouzelná čísla! Jen ty mu je můžeš vzít zpátky. Sbírej drahokamy, získej medaile a poraz draka!',
-      'Jdu na to!', () => { S.introSeen = true; saveState(); goMap(); }, true);
+    showStory(INTRO_STORY, () => { S.introSeen = true; saveState(); goMap(); });
   } else goMap();
+}
+function towerUnlocked(){
+  return S.dragonBeaten || shardCount() === 3;
 }
 function goMap(){
   playClick();
-  document.getElementById('total-gems').textContent = S.gems.pyr + S.gems.had;
-  for (const w of ['pyr','had']){
+  document.getElementById('total-gems').textContent = S.gems.pyr + S.gems.had + S.gems.bus;
+  const sv = document.getElementById('shard-view');
+  if (sv) sv.innerHTML = crystalSVG(shardCount());
+  for (const w of ['pyr','had','bus']){
     const medals = Math.floor(S.gems[w]/10);
     document.getElementById('medals-'+w).textContent = medals ? '🏅'.repeat(Math.min(medals,4)) + (medals>4?' ×'+medals:'') : '—';
     document.getElementById('map-lvl-'+w).textContent = 'Kouzlo úrovně ' + S.level[w];
   }
-  const unlocked = S.gems.pyr >= 10 && S.gems.had >= 10;
+  const unlocked = towerUnlocked();
   document.getElementById('tower-card').classList.toggle('locked', !unlocked);
   document.getElementById('tower-status').textContent = unlocked ? (S.dragonBeaten ? '👑' : '⚔️') : '🔒';
   show('screen-map');
 }
 function openTower(){
   ensureAudio();
-  const unlocked = S.gems.pyr >= 10 && S.gems.had >= 10;
-  if (!unlocked){
+  if (!towerUnlocked()){
     playWrong();
-    showPanel('🔒','Dračí věž je zamčená',
-      'Nejdřív získej alespoň jednu medaili 🏅 z Pyramidové hory i z Hadího údolí. Každá medaile je za 10 drahokamů!',
-      'Rozumím', null, false);
+    showPanel('', 'Dračí věž je zamčená',
+      'Věž otevře jen složený Křišťál čísel. Získej medaili 🏅 na Pyramidové hoře, v Hadím údolí i v Kouzelném autobuse — každá medaile je za 10 drahokamů a skrývá jeden střep!',
+      'Rozumím', null, false, crystalSVG(shardCount()));
     return;
   }
   startBossBattle();
 }
-function showPanel(emoji, title, text, btnLabel, onClose, doSpeak){
+function showStats(){
+  playClick();
+  const names = { pyr:'🏔️ Pyramidová hora', had:'🐍 Hadí údolí', bus:'🚌 Kouzelný autobus' };
+  let txt = '';
+  for (const w of ['pyr','had','bus']){
+    const st = S.stats[w];
+    const pct = st.solved ? Math.round(100*st.firstTry/st.solved) : 0;
+    txt += names[w] + '\n• úroveň ' + S.level[w] + ' (nejvýš ' + st.maxLevel + '), medailí ' + Math.floor(S.gems[w]/10) +
+           '\n• vyřešeno ' + st.solved + ' úkolů, ' + pct + ' % napoprvé\n\n';
+  }
+  const d = S.stats.drak;
+  const dpct = d.solved ? Math.round(100*d.firstTry/d.solved) : 0;
+  txt += '🐉 Dračí věž\n• vítězství ' + (d.wins||0) + ', rozbito ' + d.solved + ' kouzel, ' + dpct + ' % napoprvé';
+  showPanel('📊','Přehled pro rodiče', txt, 'Zavřít', null, false);
+}
+function showPanel(emoji, title, text, btnLabel, onClose, doSpeak, stageHTML){
+  const stage = document.getElementById('ov-stage');
+  const em = document.getElementById('ov-emoji');
+  if (stageHTML){
+    stage.innerHTML = stageHTML;
+    stage.style.display = 'block';
+    em.style.display = 'none';
+  } else {
+    stage.innerHTML = '';
+    stage.style.display = 'none';
+    em.style.display = 'block';
+  }
   document.getElementById('ov-emoji').textContent = emoji;
   document.getElementById('ov-title').textContent = title;
   document.getElementById('ov-text').textContent = text;
@@ -671,6 +893,19 @@ const WORLDS = {
       9:{svg:'spider', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
     },
     goalStory:'Došel jsi na konec Hadího údolí a našel poklad hadího krále! Získáváš zlatou medaili.'
+  },
+  bus: {
+    name:'Kouzelný autobus',
+    instruction:'Cestující na zastávkách přistupují (+) a vystupují (−). Jaké číslo patří místo otazníku?',
+    introEmoji:'🚌',
+    introTitle:'Kapitola 3: Kouzelný autobus',
+    intro:'Kouzelný autobus rozváží obyvatele království. Hlídej, kolik cestujících přistupuje a vystupuje, a dovez všechny bezpečně do cíle! Ale pozor — na silnici stojí kráva!',
+    obstacles:{
+      3:{svg:'cow', toast:'Kráva uhnula!', say:'Kráva se lekla a uhnula z cesty!'},
+      6:{svg:'cone', toast:'Opraveno!', say:'Silnice je opravená, můžeš jet dál!'},
+      9:{svg:'light', toast:'Zelená!', say:'Naskočila zelená! Jedeme dál!'}
+    },
+    goalStory:'Dovezl jsi všechny cestující až do cíle! Získáváš zlatou medaili.'
   },
   drak: {
     name:'Dračí věž',
@@ -723,14 +958,34 @@ let obstacleEls = {};
 const SLOT_B = [16,22,28,24,18,22,28,32,26,20,24];
 function slotLeft(i){ return (4 + i*9.2) + '%'; }
 function knightPos(){ return S.gems[currentWorld] % 10; }
+const AMBIENT = {
+  pyr:{ch:'❄', n:4, rise:false},
+  had:{ch:'🍃', n:3, rise:false},
+  bus:{ch:'', n:0, rise:false},
+  drak:{ch:'✨', n:4, rise:true}
+};
+function ambientHTML(w){
+  const a = AMBIENT[w];
+  if (!a || !a.n) return '';
+  let html = '';
+  for (let i=0; i<a.n; i++){
+    const left = 8 + Math.random()*84;
+    const dur = 5 + Math.random()*5;
+    const delay = -Math.random()*8;
+    html += '<span class="amb' + (a.rise ? ' amb-rise' : '') + '" style="left:' + left.toFixed(0) + '%; animation-duration:' + dur.toFixed(1) + 's; animation-delay:' + delay.toFixed(1) + 's;">' + a.ch + '</span>';
+  }
+  return html;
+}
+function bgShift(pos){ return 'translateX(-' + (pos*4) + 'px)'; }
 function renderScene(){
   const w = currentWorld;
   const scene = document.getElementById('scene');
   scene.className = 'scene ' + w;
   const pos = knightPos();
-  let html = SCENE_BG[w];
+  let html = '<div class="bg-layer" id="bg-layer" style="transform:' + bgShift(pos) + '">' + SCENE_BG[w] + '</div>';
   html += '<span class="cloud" style="top:8px; animation-duration:34s;"></span>';
   html += '<span class="cloud" style="top:28px; animation-duration:52s; animation-delay:-26s;"></span>';
+  html += ambientHTML(w);
   for (let i=0; i<=10; i++){
     html += '<div class="stone' + (i <= pos ? ' reached' : '') + '" style="left:' + slotLeft(i) + '; bottom:' + SLOT_B[i] + 'px"></div>';
   }
@@ -740,7 +995,8 @@ function renderScene(){
       html += '<div class="obstacle a-' + cfg.svg + '" id="ob-' + slot + '" style="left:' + slotLeft(Number(slot)) + '; bottom:' + (SLOT_B[slot]+8) + 'px">' + OBS_SVG[cfg.svg] + '</div>';
     }
   }
-  html += '<div class="knight" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + KNIGHT_SVG + '</div>';
+  const heroSvg = w === 'bus' ? BUS_SVG : KNIGHT_SVG;
+  html += '<div class="knight' + (w === 'bus' ? ' as-bus' : '') + '" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + heroSvg + '</div>';
   scene.innerHTML = html;
   knightEl = document.getElementById('knight');
   if (knightEl && knightEl.addEventListener){
@@ -756,6 +1012,8 @@ function moveKnight(pos){
   playStep();
   knightEl.style.left = slotLeft(pos);
   knightEl.style.bottom = (SLOT_B[pos]+10) + 'px';
+  const bg = document.getElementById('bg-layer');
+  if (bg && bg.style) bg.style.transform = bgShift(pos);
   knightEl.classList.remove('hop');
   void knightEl.offsetWidth;
   knightEl.classList.add('hop');
@@ -822,13 +1080,34 @@ function renderBossHud(){
 function renderBossScene(){
   const scene = document.getElementById('scene');
   scene.className = 'scene drak';
-  let html = SCENE_BG.drak;
+  const tired = bossHP <= 4;
+  let html = '<div class="bg-layer">' + SCENE_BG.drak + '</div>';
+  html += ambientHTML('drak');
   html += '<div class="hp-row" id="hp-row"></div>';
   html += '<div class="breath" id="breath">' + FLAME_SVG + '</div>';
+  if (tired) html += '<span class="smoke">💨</span>';
   html += '<div class="boss-knight" id="boss-knight">' + KNIGHT_SVG + '</div>';
-  html += '<div class="boss-dragon" id="boss-dragon">' + DRAGON_SVG + '</div>';
+  html += '<div class="boss-dragon' + (tired ? ' tired' : '') + '" id="boss-dragon">' + DRAGON_SVG + '</div>';
   scene.innerHTML = html;
   renderHpOrbs();
+}
+const TAUNTS = [
+  'Ha! To nikdy nespočítáš!',
+  'Moje kouzla tě zastaví!',
+  'Grrr! To byla náhoda!',
+  'Au! Přestaň s tím počítáním!',
+  'Moje krásná kouzla mizí!',
+  'Dost! Už toho nech!',
+  'Ne! Moje poslední kouzla!'
+];
+function showBubble(text){
+  const scene = document.getElementById('scene');
+  if (!scene || !scene.appendChild) return;
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = text;
+  scene.appendChild(b);
+  setTimeout(() => { if (b.remove) b.remove(); }, 2000);
 }
 function renderHpOrbs(animateNewLoss){
   const row = document.getElementById('hp-row');
@@ -857,6 +1136,7 @@ function bossHit(){
   setTimeout(() => {
     if (d && d.classList) d.classList.add('hit');
     const scene = document.getElementById('scene');
+    if (scene && scene.classList){ scene.classList.remove('shake'); scene.classList.add('shake'); setTimeout(() => scene.classList.remove('shake'), 450); }
     if (scene && scene.appendChild){
       const sp = document.createElement('div');
       sp.className = 'spark';
@@ -868,16 +1148,21 @@ function bossHit(){
   }, 250);
   renderBossHud();
   if (bossHP <= 0){
+    if (d && d.classList) setTimeout(() => d.classList.add('defeated'), 500);
     setTimeout(() => {
-      S.dragonBeaten = true; saveState();
+      S.dragonBeaten = true;
+      S.stats.drak.wins = (S.stats.drak.wins || 0) + 1;
+      saveState();
       playFanfare(); confetti();
       showPanel('👑','Drak je poražen!',
         'Rozbil jsi všechna drakova kouzla! Drak Chaos s řevem uletěl a kouzelná čísla jsou navždy v bezpečí. Jsi opravdový Rytíř Čísel!',
         'Hurá!', goMap, true);
-    }, 1100);
+    }, 1700);
   } else {
+    if (bossHP <= 4 && d && d.classList) d.classList.add('tired');
+    showBubble(TAUNTS[BOSS_MAX - 1 - bossHP] || pick(TAUNTS));
     toast(pick(PRAISE));
-    setTimeout(newTask, 1300);
+    setTimeout(newTask, 1400);
   }
 }
 
@@ -945,10 +1230,48 @@ function genSnake(level){
   return { kind:'had', vals, ops, bi, answer: vals[bi], hint };
 }
 
+function genBus(level){
+  const cfg = [null,
+    {stops:1, max:10, blank:['end']},
+    {stops:2, max:10, blank:['end']},
+    {stops:2, max:20, blank:['end']},
+    {stops:3, max:20, blank:['end','op']},
+    {stops:3, max:20, blank:['end','op','start']}
+  ][level];
+  const vals = [randInt(1, Math.min(9, cfg.max-1))];
+  const ops = [];
+  for (let i=0; i<cfg.stops; i++){
+    let k, sign, next, tries = 0;
+    do {
+      k = randInt(1, 6);
+      sign = Math.random() < 0.5 ? -1 : 1;
+      next = vals[i] + sign*k;
+      tries++;
+    } while ((next < 0 || next > cfg.max) && tries < 60);
+    if (next < 0 || next > cfg.max){ sign = next < 0 ? 1 : -1; next = vals[i] + sign*k; }
+    ops.push(sign*k);
+    vals.push(next);
+  }
+  const blank = pick(cfg.blank);
+  let missIdx, answer, revealPrefix = '', revealSuffix = '';
+  if (blank === 'end'){ missIdx = cfg.stops+1; answer = vals[vals.length-1]; }
+  else if (blank === 'start'){ missIdx = 0; answer = vals[0]; revealPrefix = '🚌 '; }
+  else {
+    const oi = randInt(0, cfg.stops-1);
+    missIdx = 1+oi; answer = Math.abs(ops[oi]);
+    revealPrefix = (ops[oi] >= 0 ? '+' : '−'); revealSuffix = ' 👤';
+  }
+  const hint = blank === 'end' ? 'Počítej od začátku: na každé zastávce přičti nebo odečti.'
+    : blank === 'start' ? 'Počítej pozpátku od konce jízdy.'
+    : 'Porovnej počet cestujících před zastávkou a po ní.';
+  return { kind:'bus', vals, ops, missIdx, answer, revealPrefix, revealSuffix, hint };
+}
+
 /* ================= rendering ================= */
 function newTask(){
   missesThisTask = 0;
   inputLocked = false;
+  hideHintBubble();
   if (currentWorld === 'drak'){
     currentTask = genDragon(BOSS_MAX - bossHP);
     renderBossHud();
@@ -957,7 +1280,9 @@ function newTask(){
     renderChoices();
     return;
   }
-  currentTask = currentWorld === 'pyr' ? genPyramid(S.level.pyr) : genSnake(S.level.had);
+  currentTask = currentWorld === 'pyr' ? genPyramid(S.level.pyr)
+              : currentWorld === 'had' ? genSnake(S.level.had)
+              : genBus(S.level.bus);
   renderGems();
   renderScene();
   renderTask();
@@ -980,6 +1305,32 @@ function renderTask(){
       eq.appendChild(stagger(ch));
     });
     area.appendChild(eq);
+    return;
+  }
+  if (t.kind === 'bus'){
+    const row = document.createElement('div');
+    row.className = 'bus-row';
+    const total = t.ops.length + 2;
+    for (let i=0; i<total; i++){
+      if (i > 0){
+        const ar = document.createElement('span');
+        ar.className = 'arrow';
+        ar.textContent = (i === total-1) ? '=' : '➜';
+        row.appendChild(stagger(ar));
+      }
+      const ch = document.createElement('div');
+      const isMissing = i === t.missIdx;
+      ch.className = 'bus-chip' + (isMissing ? ' missing' : '');
+      if (isMissing){
+        ch.id = 'miss-slot';
+        ch.textContent = i === 0 ? '🚌 ?' : (i === total-1 ? '?' : (t.ops[i-1] >= 0 ? '+' : '−') + '?');
+      }
+      else if (i === 0) ch.textContent = '🚌 ' + t.vals[0];
+      else if (i === total-1) ch.textContent = t.vals[t.vals.length-1];
+      else ch.textContent = (t.ops[i-1] >= 0 ? '+' : '−') + Math.abs(t.ops[i-1]) + ' 👤';
+      row.appendChild(stagger(ch));
+    }
+    area.appendChild(row);
     return;
   }
   if (t.kind === 'pyr'){
@@ -1046,6 +1397,8 @@ function answer(btn, val){
   const w = currentWorld;
   if (val === currentTask.answer){
     revealAnswer(val);
+    const st = S.stats[w];
+    if (st){ st.solved++; if (missesThisTask === 0) st.firstTry++; }
     if (w === 'drak'){
       playCorrect();
       bossHit();
@@ -1063,6 +1416,7 @@ function answer(btn, val){
       if (S.streak[w] >= 3 && S.level[w] < 5){
         S.level[w]++;
         S.streak[w] = 0;
+        if (S.stats[w]) S.stats[w].maxLevel = Math.max(S.stats[w].maxLevel, S.level[w]);
         setTimeout(() => toast('✨ Nové kouzlo! Úroveň ' + S.level[w]), 1000);
       }
     } else {
@@ -1081,11 +1435,19 @@ function answer(btn, val){
     const extraDelay = moveKnight(newPos);
     setTimeout(() => {
       if (gotMedal){
+        const firstMedal = Math.floor(S.gems[w]/10) === 1;
         S.medalsShown[w] = Math.floor(S.gems[w]/10);
         saveState();
         playFanfare(); confetti();
-        showPanel('🏅','Medaile!', WORLDS[w].goalStory + ' Drak Chaos se už třese strachy.',
-          'Pokračovat', newTask, true);
+        if (firstMedal){
+          const shards = shardCount();
+          const txt = WORLDS[w].goalStory + ' A našel jsi ' + shards + '. střep Křišťálu čísel!' +
+            (shards === 3 ? ' Křišťál je zase celý — Dračí věž se otevřela!' : ' Další střep hledej v jiném světě.');
+          showPanel('', 'Střep křišťálu!', txt, 'Pokračovat', newTask, true, crystalSVG(shards));
+        } else {
+          showPanel('🏅','Medaile!', WORLDS[w].goalStory + ' Drak Chaos se už třese strachy.',
+            'Pokračovat', newTask, true);
+        }
       } else newTask();
     }, 1300 + extraDelay);
   } else {
@@ -1094,10 +1456,11 @@ function answer(btn, val){
     btn.classList.add('wrong');
     missesThisTask++;
     if (S.streak[w] !== undefined) S.streak[w] = 0;
+    if (S.stats[w]) S.stats[w].misses++;
     if (missesThisTask >= 2){
       document.querySelectorAll('.choice:not(.wrong)').forEach(b => b.classList.add('hintglow'));
+      showHintBubble(currentTask.hint);
       speak(currentTask.hint);
-      toast('💡 ' + 'Nápověda!');
     } else {
       toast('Zkus to znovu!');
     }
@@ -1106,8 +1469,18 @@ function answer(btn, val){
 function revealAnswer(val){
   const ms = document.getElementById('miss-slot');
   if (!ms) return;
-  ms.textContent = String(val);
+  ms.textContent = (currentTask.revealPrefix || '') + String(val) + (currentTask.revealSuffix || '');
   if (ms.classList) ms.classList.add('solved');
+}
+function showHintBubble(text){
+  const hb = document.getElementById('hint-bubble');
+  if (!hb) return;
+  hb.textContent = '🦉 ' + text;
+  hb.style.display = 'block';
+}
+function hideHintBubble(){
+  const hb = document.getElementById('hint-bubble');
+  if (hb) hb.style.display = 'none';
 }
 function toast(msg){
   const t = document.getElementById('toast');

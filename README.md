@@ -11,11 +11,23 @@ Zlý drak Chaos ukradl království kouzelná čísla. Rytíř putuje po stezce 
 cíli — každý vyřešený úkol ho posune o krok dál a zažene překážky (troll, balvan,
 krokodýl…). Za 10 drahokamů je medaile, se dvěma medailemi se otevře Dračí věž.
 
+### Příběh
+
+Drak Chaos rozbil Křišťál čísel na tři střepy a ukryl je ve třech světech.
+První medaile v každém světě odhalí jeden střep — složený křišťál otevře
+Dračí věž a souboj s drakem.
+
 ### Světy
 
 - **🏔️ Pyramidová hora** — součtové trojúhelníky (každá cihla je součtem dvou cihel pod ní)
 - **🐍 Hadí údolí** — číselní hadi (počítání po krocích +/−)
-- **🏰 Dračí věž** — finále po získání medaile z obou světů
+- **🚌 Kouzelný autobus** — Hejného prostředí autobus: cestující přistupují a vystupují
+- **🏰 Dračí věž** — souboj s drakem: rozbíjení kouzel (rovnice s chybějícím číslem nebo znaménkem)
+
+### Pro rodiče
+
+Tlačítko 📊 na mapě ukazuje přehled: úroveň, počet vyřešených úkolů
+a úspěšnost napoprvé v každém světě.
 
 ### Vlastnosti
 
