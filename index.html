@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rytíř Čísel</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html,body { height:100%; }
+  body {
+    font-family:"Comic Sans MS","Segoe UI Rounded","Segoe UI",sans-serif;
+    background:linear-gradient(180deg,#7ec8f7 0%,#b3e0ff 45%,#c9f0c0 100%);
+    color:#2b3a55;
+    user-select:none; -webkit-user-select:none;
+    touch-action:manipulation;
+    overflow-x:hidden;
+  }
+  .screen { display:none; min-height:100vh; padding:16px; max-width:900px; margin:0 auto; }
+  .screen.active { display:flex; flex-direction:column; align-items:center; }
+
+  /* ---------- title screen ---------- */
+  #screen-title { justify-content:center; text-align:center; gap:24px; }
+  #screen-title h1 {
+    font-size:clamp(40px,9vw,72px); color:#fff;
+    text-shadow:0 4px 0 #4a6fa5, 0 8px 16px rgba(0,0,0,.25);
+    letter-spacing:2px;
+  }
+  .title-emoji { font-size:clamp(60px,14vw,110px); filter:drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+  .big-btn {
+    font-family:inherit; font-size:clamp(24px,5vw,34px); font-weight:bold;
+    padding:18px 60px; border:none; border-radius:40px; cursor:pointer;
+    background:linear-gradient(180deg,#ffd94d,#ffb300); color:#7a4a00;
+    box-shadow:0 6px 0 #cc8f00, 0 10px 20px rgba(0,0,0,.2);
+    transition:transform .1s;
+  }
+  .big-btn:active { transform:translateY(4px); box-shadow:0 2px 0 #cc8f00; }
+  .reset-link { margin-top:30px; font-size:14px; color:#5a7ba6; text-decoration:underline; cursor:pointer; background:none; border:none; font-family:inherit; }
+
+  /* ---------- map screen ---------- */
+  #screen-map h2 { font-size:clamp(26px,6vw,40px); color:#fff; text-shadow:0 3px 0 #4a6fa5; margin:8px 0 4px; }
+  .gem-total { font-size:20px; background:rgba(255,255,255,.7); padding:6px 18px; border-radius:20px; margin-bottom:18px; }
+  .map-grid { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; width:100%; }
+  .world-card {
+    flex:1 1 240px; max-width:280px; background:#fffef5; border-radius:24px;
+    padding:22px 16px; text-align:center; cursor:pointer;
+    box-shadow:0 8px 0 rgba(74,111,165,.35), 0 14px 24px rgba(0,0,0,.15);
+    border:4px solid #fff; transition:transform .12s;
+  }
+  .world-card:active { transform:scale(.96); }
+  .world-card .icon { font-size:64px; }
+  .world-card h3 { font-size:22px; margin:8px 0 4px; }
+  .world-card .medals { font-size:22px; min-height:28px; }
+  .world-card .lvl { font-size:15px; color:#7a8bab; }
+  .world-card.locked { filter:grayscale(1); opacity:.75; }
+
+  /* ---------- game screen ---------- */
+  #screen-game { gap:10px; }
+  .game-top { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; flex-wrap:wrap; }
+  .icon-btn {
+    font-family:inherit; font-size:20px; font-weight:bold; border:none; cursor:pointer;
+    background:#fffef5; color:#2b3a55; border-radius:18px; padding:10px 18px;
+    box-shadow:0 4px 0 rgba(74,111,165,.35);
+  }
+  .icon-btn:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(74,111,165,.35); }
+  #game-title { font-size:clamp(20px,5vw,30px); color:#fff; text-shadow:0 2px 0 #4a6fa5; }
+  #lvl-badge { font-size:15px; background:#e8d5ff; color:#5b2d91; padding:6px 14px; border-radius:16px; font-weight:bold; }
+
+  .gem-bar { display:flex; gap:10px; align-items:center; margin:2px 0; flex-wrap:wrap; justify-content:center; }
+  .hud-chip { font-size:18px; font-weight:bold; background:rgba(255,255,255,.8); padding:4px 14px; border-radius:16px; }
+  @keyframes pop { 0%{transform:scale(0);} 70%{transform:scale(1.4);} 100%{transform:scale(1);} }
+
+  /* ---------- journey scene ---------- */
+  .scene {
+    position:relative; width:100%; max-width:640px; height:100px;
+    border-radius:18px; overflow:hidden; border:3px solid #fff;
+    box-shadow:0 6px 14px rgba(0,0,0,.15);
+  }
+  .scene.pyr { background:linear-gradient(180deg,#aadcff 0%,#cfeaff 52%,#e0c98f 52%,#cdb072 100%); }
+  .scene.had { background:linear-gradient(180deg,#aadcff 0%,#d8f3c4 52%,#8fce6d 52%,#6fb54c 100%); }
+  .stone { position:absolute; bottom:10px; width:24px; height:13px; border-radius:50%;
+    background:rgba(90,70,40,.35); transform:translateX(-50%); }
+  .stone.reached { background:#ffd94d; box-shadow:0 0 6px 2px rgba(255,217,77,.7); }
+  .knight { position:absolute; bottom:22px; font-size:36px; z-index:5;
+    transition:left .7s ease; transform:translateX(-50%) scaleX(-1);
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)); }
+  .knight.hop { animation:hop .7s ease; }
+  @keyframes hop { 50% { transform:translateX(-50%) scaleX(-1) translateY(-24px); } }
+  .obstacle { position:absolute; bottom:20px; font-size:32px; z-index:4;
+    transform:translateX(-50%); transition:transform .7s ease, opacity .7s ease; }
+  .obstacle.flee { transform:translateX(-50%) translateY(-70px) rotate(300deg); opacity:0; }
+  .goal { position:absolute; bottom:18px; font-size:34px; z-index:3; transform:translateX(-50%); animation:pulse 1.6s infinite; }
+
+  .instruction {
+    background:rgba(255,255,255,.85); border-radius:18px; padding:10px 16px;
+    font-size:clamp(15px,3.6vw,19px); text-align:center; max-width:640px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .speak-btn { border:none; background:#dff0ff; border-radius:50%; width:44px; height:44px; font-size:22px; cursor:pointer; flex-shrink:0; box-shadow:0 3px 0 #9cc4e4; }
+  .speak-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #9cc4e4; }
+
+  #task-area { display:flex; flex-direction:column; align-items:center; gap:6px; margin:14px 0 6px; min-height:200px; justify-content:center; width:100%; }
+
+  /* pyramid */
+  .pyr-row { display:flex; gap:6px; justify-content:center; }
+  .brick {
+    width:min(88px,19vw); height:min(60px,13vw);
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(20px,5vw,30px); font-weight:bold; color:#5c3a10;
+    background:linear-gradient(180deg,#ffe1a8,#f0b860);
+    border:3px solid #c98f3d; border-radius:12px;
+    box-shadow:inset 0 -6px 0 rgba(0,0,0,.08);
+  }
+  .brick.missing {
+    background:#fff; color:#e2544a; border:3px dashed #e2544a;
+    animation:pulse 1.2s infinite;
+  }
+  @keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.07);} }
+
+  /* snake */
+  .snake { display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:4px; row-gap:14px; }
+  .snake .seg {
+    width:min(70px,16vw); height:min(70px,16vw); border-radius:50%;
+    background:linear-gradient(180deg,#b6e388,#7cc24e); border:3px solid #4e8a26;
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(20px,5vw,28px); font-weight:bold; color:#274d10;
+    box-shadow:inset 0 -5px 0 rgba(0,0,0,.1);
+  }
+  .snake .seg.head { background:linear-gradient(180deg,#8fd463,#59a82f); position:relative; }
+  .snake .seg.missing { background:#fff; color:#e2544a; border:3px dashed #e2544a; animation:pulse 1.2s infinite; }
+  .snake .op {
+    font-size:clamp(16px,4vw,22px); font-weight:bold; color:#2b3a55;
+    background:#fffef5; border-radius:14px; padding:4px 10px; margin:0 2px;
+    box-shadow:0 3px 0 rgba(74,111,165,.3);
+  }
+  .snake .arrow { font-size:18px; color:#4e8a26; }
+  .snake-emoji { font-size:34px; margin-right:2px; }
+
+  /* choices */
+  .choices { display:flex; gap:16px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+  .choice {
+    font-family:inherit; font-size:clamp(26px,6vw,36px); font-weight:bold;
+    width:min(110px,26vw); height:min(84px,20vw);
+    border:none; border-radius:22px; cursor:pointer;
+    background:linear-gradient(180deg,#9ad8ff,#4aa8e8); color:#083b63;
+    box-shadow:0 6px 0 #2f7fb5, 0 10px 16px rgba(0,0,0,.15);
+    transition:transform .1s;
+  }
+  .choice:active { transform:translateY(4px); box-shadow:0 2px 0 #2f7fb5; }
+  .choice.wrong { background:#d9d9d9; color:#999; box-shadow:0 6px 0 #b5b5b5; animation:shake .4s; pointer-events:none; }
+  .choice.hintglow { animation:glow 1s infinite; }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
+  @keyframes glow { 0%,100%{box-shadow:0 6px 0 #2f7fb5,0 0 6px 3px #ffd94d;} 50%{box-shadow:0 6px 0 #2f7fb5,0 0 20px 10px #ffd94d;} }
+
+  /* toast */
+  #toast {
+    position:fixed; top:38%; left:50%; transform:translate(-50%,-50%) scale(0);
+    font-size:clamp(34px,8vw,56px); font-weight:bold; color:#fff;
+    text-shadow:0 3px 0 #3f9e3f, 0 6px 14px rgba(0,0,0,.3);
+    pointer-events:none; z-index:50; white-space:nowrap;
+  }
+  #toast.show { animation:toastIn .9s ease; }
+  @keyframes toastIn { 0%{transform:translate(-50%,-50%) scale(0);} 30%{transform:translate(-50%,-50%) scale(1.15);} 60%{transform:translate(-50%,-50%) scale(1);} 100%{transform:translate(-50%,-70%) scale(1); opacity:0;} }
+
+  /* overlay (story / medal / final) */
+  #overlay {
+    position:fixed; inset:0; background:rgba(30,45,80,.55); z-index:100;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  #overlay.show { display:flex; }
+  .panel {
+    background:#fffef5; border-radius:28px; padding:30px 26px; max-width:480px;
+    text-align:center; box-shadow:0 16px 40px rgba(0,0,0,.35);
+    animation:panelIn .35s ease;
+  }
+  @keyframes panelIn { from{transform:scale(.7); opacity:0;} to{transform:scale(1); opacity:1;} }
+  .panel .big-emoji { font-size:70px; }
+  .panel h3 { font-size:26px; margin:10px 0; }
+  .panel p { font-size:18px; line-height:1.45; margin-bottom:18px; }
+
+  .confetti-piece { position:fixed; top:-40px; font-size:26px; z-index:99; animation:fall linear forwards; pointer-events:none; }
+  @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
+</style>
+</head>
+<body>
+
+<!-- ============ TITLE ============ -->
+<div id="screen-title" class="screen active">
+  <div class="title-emoji">⚔️🛡️</div>
+  <h1>Rytíř Čísel</h1>
+  <button class="big-btn" onclick="startGame()">Hrát</button>
+  <button class="reset-link" onclick="resetProgress()">Smazat postup</button>
+</div>
+
+<!-- ============ MAP ============ -->
+<div id="screen-map" class="screen">
+  <h2>Mapa království</h2>
+  <div class="gem-total">💎 <span id="total-gems">0</span> drahokamů</div>
+  <div class="map-grid">
+    <div class="world-card" onclick="openWorld('pyr')">
+      <div class="icon">🏔️</div>
+      <h3>Pyramidová hora</h3>
+      <div class="medals" id="medals-pyr"></div>
+      <div class="lvl" id="map-lvl-pyr"></div>
+    </div>
+    <div class="world-card" onclick="openWorld('had')">
+      <div class="icon">🐍</div>
+      <h3>Hadí údolí</h3>
+      <div class="medals" id="medals-had"></div>
+      <div class="lvl" id="map-lvl-had"></div>
+    </div>
+    <div class="world-card" id="tower-card" onclick="openTower()">
+      <div class="icon">🏰</div>
+      <h3>Dračí věž</h3>
+      <div class="medals" id="tower-status">🔒</div>
+      <div class="lvl">Získej medaili z obou světů!</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GAME ============ -->
+<div id="screen-game" class="screen">
+  <div class="game-top">
+    <button class="icon-btn" onclick="goMap()">🗺️ Mapa</button>
+    <div id="game-title"></div>
+    <div id="lvl-badge"></div>
+  </div>
+  <div class="gem-bar" id="gem-bar"></div>
+  <div class="scene" id="scene"></div>
+  <div class="instruction">
+    <button class="speak-btn" onclick="speakInstruction()">🔊</button>
+    <span id="instruction-text"></span>
+  </div>
+  <div id="task-area"></div>
+  <div class="choices" id="choices"></div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ============ OVERLAY ============ -->
+<div id="overlay">
+  <div class="panel">
+    <div class="big-emoji" id="ov-emoji">🐉</div>
+    <h3 id="ov-title"></h3>
+    <p id="ov-text"></p>
+    <button class="big-btn" style="font-size:22px; padding:12px 40px;" id="ov-btn">Pokračovat</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ================= state ================= */
+const DEFAULT_STATE = {
+  gems:{pyr:0, had:0},
+  level:{pyr:1, had:1},
+  streak:{pyr:0, had:0},
+  failStreak:{pyr:0, had:0},
+  medalsShown:{pyr:0, had:0},
+  worldIntro:{pyr:false, had:false},
+  introSeen:false,
+  dragonBeaten:false
+};
+let S = loadState();
+function loadState(){
+  try {
+    const raw = localStorage.getItem('rytirCisel');
+    if (raw) return Object.assign(JSON.parse(JSON.stringify(DEFAULT_STATE)), JSON.parse(raw));
+  } catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+function saveState(){ try { localStorage.setItem('rytirCisel', JSON.stringify(S)); } catch(e){} }
+function resetProgress(){
+  if (confirm('Opravdu smazat všechen postup?')) {
+    S = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    saveState();
+    alert('Postup byl smazán.');
+  }
+}
+
+/* ================= helpers ================= */
+function randInt(a,b){ return a + Math.floor(Math.random()*(b-a+1)); }
+function pick(arr){ return arr[randInt(0,arr.length-1)]; }
+function shuffle(arr){
+  for (let i=arr.length-1; i>0; i--){ const j=randInt(0,i); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+  return arr;
+}
+function makeChoices(ans){
+  const set = new Set([ans]);
+  let guard = 0;
+  while (set.size < 3 && guard++ < 100){
+    const d = ans + (Math.random()<0.5?-1:1)*randInt(1,3);
+    if (d >= 0) set.add(d);
+  }
+  while (set.size < 3) set.add(ans + set.size);
+  return shuffle([...set]);
+}
+
+/* ================= audio ================= */
+let AC = null;
+function ensureAudio(){
+  if (!AC) { try { AC = new (window.AudioContext||window.webkitAudioContext)(); } catch(e){} }
+  if (AC && AC.state === 'suspended') AC.resume();
+}
+function tone(freq, when, dur, type, vol){
+  if (!AC) return;
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type||'sine'; o.frequency.value = freq;
+  g.gain.setValueAtTime(vol||0.15, AC.currentTime + when);
+  g.gain.exponentialRampToValueAtTime(0.001, AC.currentTime + when + dur);
+  o.connect(g); g.connect(AC.destination);
+  o.start(AC.currentTime + when); o.stop(AC.currentTime + when + dur + 0.05);
+}
+function playCorrect(){ tone(523,0,.15); tone(659,.13,.15); tone(784,.26,.3); }
+function playStep(){ tone(440,0,.08,'triangle',.08); tone(554,.1,.1,'triangle',.08); }
+function playFlee(){ tone(880,0,.1); tone(740,.1,.1); tone(587,.2,.1); tone(440,.3,.2); }
+function playWrong(){ tone(196,0,.3,'triangle',.12); }
+function playClick(){ tone(600,0,.06,'square',.05); }
+function playFanfare(){ tone(523,0,.18); tone(659,.15,.18); tone(784,.3,.18); tone(1047,.45,.5); }
+
+/* ================= speech ================= */
+function speak(text){
+  try {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'cs-CZ'; u.rate = 0.92;
+    const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith('cs'));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+if ('speechSynthesis' in window) speechSynthesis.getVoices();
+
+/* ================= screens ================= */
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function startGame(){
+  ensureAudio(); playClick();
+  if (!S.introSeen){
+    showPanel('🐉','Drak Chaos!',
+      'Zlý drak Chaos ukradl království kouzelná čísla! Jen ty mu je můžeš vzít zpátky. Sbírej drahokamy, získej medaile a poraz draka!',
+      'Jdu na to!', () => { S.introSeen = true; saveState(); goMap(); }, true);
+  } else goMap();
+}
+function goMap(){
+  playClick();
+  document.getElementById('total-gems').textContent = S.gems.pyr + S.gems.had;
+  for (const w of ['pyr','had']){
+    const medals = Math.floor(S.gems[w]/10);
+    document.getElementById('medals-'+w).textContent = medals ? '🏅'.repeat(Math.min(medals,5)) + (medals>5?' ×'+medals:'') : '— zatím bez medaile —';
+    document.getElementById('map-lvl-'+w).textContent = 'Kouzlo úrovně ' + S.level[w];
+  }
+  const unlocked = S.gems.pyr >= 10 && S.gems.had >= 10;
+  document.getElementById('tower-card').classList.toggle('locked', !unlocked);
+  document.getElementById('tower-status').textContent = unlocked ? (S.dragonBeaten ? '👑' : '⚔️') : '🔒';
+  show('screen-map');
+}
+function openTower(){
+  ensureAudio();
+  const unlocked = S.gems.pyr >= 10 && S.gems.had >= 10;
+  if (!unlocked){
+    playWrong();
+    showPanel('🔒','Dračí věž je zamčená',
+      'Nejdřív získej alespoň jednu medaili 🏅 z Pyramidové hory i z Hadího údolí. Každá medaile je za 10 drahokamů!',
+      'Rozumím', null, false);
+    return;
+  }
+  S.dragonBeaten = true; saveState();
+  playFanfare(); confetti();
+  showPanel('👑','Drak je poražen!',
+    'Dokázal jsi to! Drak Chaos utekl a kouzelná čísla jsou zachráněna. Jsi opravdový Rytíř Čísel! Můžeš dál sbírat drahokamy a medaile.',
+    'Hurá!', null, true);
+}
+function showPanel(emoji, title, text, btnLabel, onClose, doSpeak){
+  document.getElementById('ov-emoji').textContent = emoji;
+  document.getElementById('ov-title').textContent = title;
+  document.getElementById('ov-text').textContent = text;
+  const btn = document.getElementById('ov-btn');
+  btn.textContent = btnLabel;
+  btn.onclick = () => {
+    playClick();
+    if ('speechSynthesis' in window) speechSynthesis.cancel();
+    document.getElementById('overlay').classList.remove('show');
+    if (onClose) onClose();
+  };
+  document.getElementById('overlay').classList.add('show');
+  if (doSpeak) speak(title + '. ' + text);
+}
+
+/* ================= worlds ================= */
+const WORLDS = {
+  pyr: {
+    name:'Pyramidová hora',
+    instruction:'Každá cihla je součtem dvou cihel pod ní. Jaké číslo patří místo otazníku?',
+    goal:'🚩',
+    introEmoji:'🏔️',
+    introTitle:'Kapitola 1: Pyramidová hora',
+    intro:'Na vrcholu hory svítí ukradený drahokam! Vyprav se po horské stezce až nahoru. Každý vyřešený úkol tě posune o jeden krok. Ale pozor — cestu hlídá troll!',
+    obstacles:{
+      3:{e:'🧌', toast:'Troll utekl!', say:'Troll se lekl tvého počítání a utekl!'},
+      6:{e:'🪨', toast:'Balvan odvalen!', say:'Kouzlem čísel jsi odvalil obrovský balvan z cesty!'},
+      9:{e:'🦅', toast:'Orel odletěl!', say:'Dračí orel dostal strach a odletěl pryč!'}
+    },
+    goalStory:'Vystoupal jsi až na vrchol Pyramidové hory a zachránil drahokam! Získáváš zlatou medaili.'
+  },
+  had: {
+    name:'Hadí údolí',
+    instruction:'Had počítá od hlavy k ocásku. Jaké číslo patří místo otazníku?',
+    goal:'💰',
+    introEmoji:'🐍',
+    introTitle:'Kapitola 2: Hadí údolí',
+    intro:'Hadí král schoval na konci údolí truhlu plnou drahokamů! Projdi džunglí až k pokladu. Každý vyřešený úkol tě posune o jeden krok. Ale pozor na krokodýla!',
+    obstacles:{
+      3:{e:'🐊', toast:'Krokodýl zmizel!', say:'Krokodýl se ponořil a uplaval pryč!'},
+      6:{e:'🌊', toast:'Řeka přeskočena!', say:'Čísla ti postavila most přes divokou řeku!'},
+      9:{e:'🕷️', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
+    },
+    goalStory:'Došel jsi na konec Hadího údolí a našel poklad hadího krále! Získáváš zlatou medaili.'
+  }
+};
+let currentWorld = null;
+let currentTask = null;
+let missesThisTask = 0;
+let inputLocked = false;
+
+function openWorld(w){
+  ensureAudio(); playClick();
+  currentWorld = w;
+  document.getElementById('game-title').textContent = WORLDS[w].name;
+  document.getElementById('instruction-text').textContent = WORLDS[w].instruction;
+  show('screen-game');
+  newTask();
+  if (!S.worldIntro[w]){
+    showPanel(WORLDS[w].introEmoji, WORLDS[w].introTitle, WORLDS[w].intro, 'Vyrážím!',
+      () => { S.worldIntro[w] = true; saveState(); }, true);
+  }
+}
+function speakInstruction(){
+  ensureAudio();
+  speak(WORLDS[currentWorld].instruction);
+}
+function renderGems(){
+  const g = S.gems[currentWorld];
+  const bar = document.getElementById('gem-bar');
+  bar.innerHTML = '';
+  const gems = document.createElement('span');
+  gems.className = 'hud-chip';
+  gems.textContent = '💎 ' + g;
+  bar.appendChild(gems);
+  const medals = Math.floor(g/10);
+  if (medals > 0){
+    const m = document.createElement('span');
+    m.className = 'hud-chip';
+    m.textContent = '🏅 ' + medals;
+    bar.appendChild(m);
+  }
+  document.getElementById('lvl-badge').textContent = '✨ Úroveň ' + S.level[currentWorld];
+}
+
+/* ---------- journey scene ---------- */
+let knightEl = null;
+let obstacleEls = {};
+function slotLeft(i){ return (4 + i*9.2) + '%'; }
+function knightPos(){ return S.gems[currentWorld] % 10; }
+function renderScene(){
+  const w = currentWorld;
+  const scene = document.getElementById('scene');
+  scene.className = 'scene ' + w;
+  scene.innerHTML = '';
+  obstacleEls = {};
+  const pos = knightPos();
+  for (let i=0; i<=10; i++){
+    const s = document.createElement('div');
+    s.className = 'stone' + (i <= pos ? ' reached' : '');
+    s.style.left = slotLeft(i);
+    scene.appendChild(s);
+  }
+  const goal = document.createElement('div');
+  goal.className = 'goal';
+  goal.style.left = slotLeft(10);
+  goal.textContent = WORLDS[w].goal;
+  scene.appendChild(goal);
+  for (const [slot, cfg] of Object.entries(WORLDS[w].obstacles)){
+    if (Number(slot) > pos){
+      const o = document.createElement('div');
+      o.className = 'obstacle';
+      o.style.left = slotLeft(Number(slot));
+      o.textContent = cfg.e;
+      scene.appendChild(o);
+      obstacleEls[slot] = o;
+    }
+  }
+  knightEl = document.createElement('div');
+  knightEl.className = 'knight';
+  knightEl.style.left = slotLeft(pos);
+  knightEl.textContent = '🤺';
+  scene.appendChild(knightEl);
+}
+function moveKnight(pos){
+  if (!knightEl) return 0;
+  playStep();
+  knightEl.style.left = slotLeft(pos);
+  knightEl.classList.remove('hop');
+  void knightEl.offsetWidth;
+  knightEl.classList.add('hop');
+  const cfg = WORLDS[currentWorld].obstacles[pos];
+  const ob = obstacleEls[pos];
+  if (cfg && ob){
+    setTimeout(() => {
+      ob.classList.add('flee');
+      playFlee();
+      toast(cfg.toast);
+      speak(cfg.say);
+      delete obstacleEls[pos];
+    }, 650);
+    return 1100;
+  }
+  return 0;
+}
+
+/* ================= task generation ================= */
+function genPyramid(level){
+  const cfg = [null,
+    {base:2, maxB:9, missing:['top']},
+    {base:2, maxB:9, missing:['base']},
+    {base:3, maxB:6, missing:['top','mid']},
+    {base:3, maxB:6, missing:['base','mid']},
+    {base:4, maxB:3, missing:['base','mid','top']}
+  ][level];
+  let base;
+  do { base = Array.from({length:cfg.base}, () => randInt(0, cfg.maxB)); }
+  while (base.reduce((a,b)=>a+b,0) < 3);
+  const rows = [base];
+  while (rows[rows.length-1].length > 1){
+    const prev = rows[rows.length-1];
+    rows.push(prev.slice(1).map((v,i) => v + prev[i]));
+  }
+  const type = pick(cfg.missing);
+  let mr, mi;
+  if (type === 'top'){ mr = rows.length-1; mi = 0; }
+  else if (type === 'base'){ mr = 0; mi = randInt(0, rows[0].length-1); }
+  else { mr = randInt(1, rows.length-2); mi = randInt(0, rows[mr].length-1); }
+  const hint = (mr === rows.length-1)
+    ? 'Sečti dvě cihly hned pod otazníkem.'
+    : 'Otazník a cihla vedle něj dají dohromady cihlu nad nimi.';
+  return { kind:'pyr', rows, mr, mi, answer: rows[mr][mi], hint };
+}
+
+function genSnake(level){
+  const cfg = [null,
+    {len:3, max:10, step:5, blank:'last'},
+    {len:4, max:10, step:5, blank:'mid'},
+    {len:4, max:20, step:7, blank:'midlast'},
+    {len:5, max:20, step:7, blank:'any'},
+    {len:5, max:20, step:9, blank:'firstmid'}
+  ][level];
+  const vals = [randInt(0, cfg.max)];
+  const ops = [];
+  for (let i=1; i<cfg.len; i++){
+    let k, sign, next, tries = 0;
+    do {
+      k = randInt(1, cfg.step);
+      sign = Math.random() < 0.5 ? -1 : 1;
+      next = vals[i-1] + sign*k;
+      tries++;
+    } while ((next < 0 || next > cfg.max) && tries < 60);
+    if (next < 0 || next > cfg.max){ sign = next < 0 ? 1 : -1; next = vals[i-1] + sign*k; }
+    ops.push(sign*k);
+    vals.push(next);
+  }
+  let bi;
+  switch (cfg.blank){
+    case 'last':     bi = cfg.len-1; break;
+    case 'mid':      bi = randInt(1, cfg.len-2); break;
+    case 'midlast':  bi = randInt(1, cfg.len-1); break;
+    case 'any':      bi = randInt(0, cfg.len-1); break;
+    case 'firstmid': bi = Math.random() < 0.4 ? 0 : randInt(1, cfg.len-2); break;
+  }
+  const hint = bi === 0
+    ? 'Počítej pozpátku: udělej opačný krok, než říká první šipka.'
+    : 'Vezmi číslo před otazníkem a udělej krok, který říká šipka.';
+  return { kind:'had', vals, ops, bi, answer: vals[bi], hint };
+}
+
+/* ================= rendering ================= */
+function newTask(){
+  missesThisTask = 0;
+  inputLocked = false;
+  currentTask = currentWorld === 'pyr' ? genPyramid(S.level.pyr) : genSnake(S.level.had);
+  renderGems();
+  renderScene();
+  renderTask();
+  renderChoices();
+}
+function renderTask(){
+  const area = document.getElementById('task-area');
+  area.innerHTML = '';
+  const t = currentTask;
+  if (t.kind === 'pyr'){
+    for (let r = t.rows.length-1; r >= 0; r--){
+      const row = document.createElement('div');
+      row.className = 'pyr-row';
+      t.rows[r].forEach((v,i) => {
+        const b = document.createElement('div');
+        const isMissing = (r === t.mr && i === t.mi);
+        b.className = 'brick' + (isMissing ? ' missing' : '');
+        b.textContent = isMissing ? '?' : v;
+        row.appendChild(b);
+      });
+      area.appendChild(row);
+    }
+  } else {
+    const snake = document.createElement('div');
+    snake.className = 'snake';
+    const head = document.createElement('span');
+    head.className = 'snake-emoji';
+    head.textContent = '🐍';
+    snake.appendChild(head);
+    t.vals.forEach((v,i) => {
+      const seg = document.createElement('div');
+      const isMissing = i === t.bi;
+      seg.className = 'seg' + (i === 0 ? ' head' : '') + (isMissing ? ' missing' : '');
+      seg.textContent = isMissing ? '?' : v;
+      snake.appendChild(seg);
+      if (i < t.ops.length){
+        const arrow = document.createElement('span');
+        arrow.className = 'arrow';
+        arrow.textContent = '➜';
+        const op = document.createElement('span');
+        op.className = 'op';
+        op.textContent = (t.ops[i] >= 0 ? '+' : '−') + Math.abs(t.ops[i]);
+        snake.appendChild(arrow);
+        snake.appendChild(op);
+      }
+    });
+    area.appendChild(snake);
+  }
+}
+function renderChoices(){
+  const box = document.getElementById('choices');
+  box.innerHTML = '';
+  makeChoices(currentTask.answer).forEach(v => {
+    const b = document.createElement('button');
+    b.className = 'choice';
+    b.textContent = v;
+    b.onclick = () => answer(b, v);
+    box.appendChild(b);
+  });
+}
+
+/* ================= answering ================= */
+const PRAISE = ['Výborně!','Skvěle!','Paráda!','Super!','Přesně tak!','Jsi kouzelník!'];
+function answer(btn, val){
+  if (inputLocked) return;
+  ensureAudio();
+  const w = currentWorld;
+  if (val === currentTask.answer){
+    inputLocked = true;
+    playCorrect();
+    toast(pick(PRAISE));
+    S.gems[w]++;
+    if (missesThisTask >= 2){ S.failStreak[w]++; }
+    else if (missesThisTask === 0){
+      S.failStreak[w] = 0;
+      S.streak[w]++;
+      if (S.streak[w] >= 3 && S.level[w] < 5){
+        S.level[w]++;
+        S.streak[w] = 0;
+        setTimeout(() => toast('✨ Nové kouzlo! Úroveň ' + S.level[w]), 1000);
+      }
+    } else {
+      S.failStreak[w] = 0;
+      S.streak[w] = 0;
+    }
+    if (S.failStreak[w] >= 2 && S.level[w] > 1){
+      S.level[w]--;
+      S.failStreak[w] = 0;
+      S.streak[w] = 0;
+    }
+    saveState();
+    renderGems();
+    const gotMedal = S.gems[w] % 10 === 0 && Math.floor(S.gems[w]/10) > S.medalsShown[w];
+    const newPos = gotMedal ? 10 : S.gems[w] % 10;
+    const extraDelay = moveKnight(newPos);
+    setTimeout(() => {
+      if (gotMedal){
+        S.medalsShown[w] = Math.floor(S.gems[w]/10);
+        saveState();
+        playFanfare(); confetti();
+        showPanel('🏅','Medaile!', WORLDS[w].goalStory + ' Drak Chaos se už třese strachy.',
+          'Pokračovat', newTask, true);
+      } else newTask();
+    }, 1300 + extraDelay);
+  } else {
+    playWrong();
+    btn.classList.add('wrong');
+    missesThisTask++;
+    S.streak[w] = 0;
+    if (missesThisTask >= 2){
+      document.querySelectorAll('.choice:not(.wrong)').forEach(b => b.classList.add('hintglow'));
+      speak(currentTask.hint);
+      toast('💡 ' + 'Nápověda!');
+    } else {
+      toast('Zkus to znovu!');
+    }
+  }
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+}
+function confetti(){
+  const emojis = ['🎉','⭐','💎','🎊','✨','🏅'];
+  for (let i=0; i<36; i++){
+    const p = document.createElement('span');
+    p.className = 'confetti-piece';
+    p.textContent = pick(emojis);
+    p.style.left = randInt(2,96) + 'vw';
+    p.style.animationDuration = (1.6 + Math.random()*1.6) + 's';
+    p.style.animationDelay = (Math.random()*0.8) + 's';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 4200);
+  }
+}
+</script>
+</body>
+</html>
