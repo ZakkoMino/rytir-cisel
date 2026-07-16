@@ -4,11 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Rytíř Čísel</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚔️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap" rel="stylesheet">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html,body { height:100%; }
   body {
-    font-family:"Comic Sans MS","Segoe UI Rounded","Segoe UI",sans-serif;
+    font-family:"Baloo 2","Comic Sans MS","Segoe UI Rounded","Segoe UI",sans-serif;
     background:linear-gradient(180deg,#7ec8f7 0%,#b3e0ff 45%,#c9f0c0 100%);
     color:#2b3a55;
     user-select:none; -webkit-user-select:none;
@@ -16,94 +20,122 @@
     overflow-x:hidden;
   }
   .screen { display:none; min-height:100vh; padding:16px; max-width:900px; margin:0 auto; }
-  .screen.active { display:flex; flex-direction:column; align-items:center; }
+  .screen.active { display:flex; flex-direction:column; align-items:center; animation:fadeIn .35s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
 
   /* ---------- title screen ---------- */
-  #screen-title { justify-content:center; text-align:center; gap:24px; }
+  #screen-title { justify-content:center; text-align:center; gap:20px; }
   #screen-title h1 {
-    font-size:clamp(40px,9vw,72px); color:#fff;
+    font-size:clamp(42px,9vw,76px); color:#fff; font-weight:800;
     text-shadow:0 4px 0 #4a6fa5, 0 8px 16px rgba(0,0,0,.25);
     letter-spacing:2px;
   }
-  .title-emoji { font-size:clamp(60px,14vw,110px); filter:drop-shadow(0 6px 8px rgba(0,0,0,.25)); }
+  .hero { display:flex; align-items:flex-end; gap:clamp(24px,9vw,90px); }
+  .hero > div { filter:drop-shadow(0 8px 10px rgba(0,0,0,.25)); }
+  #hero-knight { width:clamp(100px,24vw,150px); animation:bob 2.4s ease-in-out infinite; }
+  #hero-dragon { width:clamp(120px,28vw,185px); animation:hover 3s ease-in-out infinite; }
+  #hero-knight svg, #hero-dragon svg { width:100%; height:auto; display:block; }
+  @keyframes bob { 50% { transform:translateY(-6px); } }
+  @keyframes hover { 50% { transform:translateY(-13px); } }
   .big-btn {
     font-family:inherit; font-size:clamp(24px,5vw,34px); font-weight:bold;
-    padding:18px 60px; border:none; border-radius:40px; cursor:pointer;
+    padding:14px 60px; border:none; border-radius:40px; cursor:pointer;
     background:linear-gradient(180deg,#ffd94d,#ffb300); color:#7a4a00;
     box-shadow:0 6px 0 #cc8f00, 0 10px 20px rgba(0,0,0,.2);
     transition:transform .1s;
   }
   .big-btn:active { transform:translateY(4px); box-shadow:0 2px 0 #cc8f00; }
-  .reset-link { margin-top:30px; font-size:14px; color:#5a7ba6; text-decoration:underline; cursor:pointer; background:none; border:none; font-family:inherit; }
+  .reset-link { margin-top:24px; font-size:14px; color:#5a7ba6; text-decoration:underline; cursor:pointer; background:none; border:none; font-family:inherit; }
 
   /* ---------- map screen ---------- */
-  #screen-map h2 { font-size:clamp(26px,6vw,40px); color:#fff; text-shadow:0 3px 0 #4a6fa5; margin:8px 0 4px; }
-  .gem-total { font-size:20px; background:rgba(255,255,255,.7); padding:6px 18px; border-radius:20px; margin-bottom:18px; }
-  .map-grid { display:flex; flex-wrap:wrap; gap:20px; justify-content:center; width:100%; }
-  .world-card {
-    flex:1 1 240px; max-width:280px; background:#fffef5; border-radius:24px;
-    padding:22px 16px; text-align:center; cursor:pointer;
-    box-shadow:0 8px 0 rgba(74,111,165,.35), 0 14px 24px rgba(0,0,0,.15);
-    border:4px solid #fff; transition:transform .12s;
+  #screen-map h2 { font-size:clamp(26px,6vw,40px); color:#fff; font-weight:800; text-shadow:0 3px 0 #4a6fa5; margin:4px 0; }
+  .gem-total { font-size:19px; background:rgba(255,255,255,.75); padding:4px 18px; border-radius:20px; margin-bottom:14px; font-weight:bold; }
+  .map-wrap {
+    position:relative; width:100%; max-width:860px;
+    height:clamp(360px,60vw,530px);
+    border-radius:24px; overflow:hidden; border:4px solid #fff;
+    box-shadow:0 10px 24px rgba(0,0,0,.2);
   }
-  .world-card:active { transform:scale(.96); }
-  .world-card .icon { font-size:64px; }
-  .world-card h3 { font-size:22px; margin:8px 0 4px; }
-  .world-card .medals { font-size:22px; min-height:28px; }
-  .world-card .lvl { font-size:15px; color:#7a8bab; }
-  .world-card.locked { filter:grayscale(1); opacity:.75; }
+  .map-bg { position:absolute; inset:0; width:100%; height:100%; }
+  .map-node {
+    position:absolute; transform:translate(-50%,-50%);
+    width:clamp(118px,19vw,172px);
+    background:rgba(255,255,250,.92); border:3px solid #fff; border-radius:18px;
+    padding:8px 6px; text-align:center; cursor:pointer;
+    box-shadow:0 6px 0 rgba(74,111,165,.3), 0 10px 18px rgba(0,0,0,.15);
+    transition:transform .12s;
+  }
+  .map-node:active { transform:translate(-50%,-50%) scale(.95); }
+  .map-node .node-icon svg { width:clamp(50px,9vw,74px); height:auto; }
+  .map-node h3 { font-size:clamp(13px,2.5vw,18px); margin:0; line-height:1.15; }
+  .map-node .medals { font-size:clamp(14px,2.4vw,18px); min-height:22px; }
+  .map-node .lvl { font-size:clamp(10px,2vw,13px); color:#7a8bab; line-height:1.2; }
+  .map-node.locked { filter:grayscale(1); opacity:.8; }
 
   /* ---------- game screen ---------- */
   #screen-game { gap:10px; }
   .game-top { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; flex-wrap:wrap; }
   .icon-btn {
-    font-family:inherit; font-size:20px; font-weight:bold; border:none; cursor:pointer;
-    background:#fffef5; color:#2b3a55; border-radius:18px; padding:10px 18px;
+    font-family:inherit; font-size:19px; font-weight:bold; border:none; cursor:pointer;
+    background:#fffef5; color:#2b3a55; border-radius:18px; padding:8px 18px;
     box-shadow:0 4px 0 rgba(74,111,165,.35);
   }
   .icon-btn:active { transform:translateY(3px); box-shadow:0 1px 0 rgba(74,111,165,.35); }
-  #game-title { font-size:clamp(20px,5vw,30px); color:#fff; text-shadow:0 2px 0 #4a6fa5; }
-  #lvl-badge { font-size:15px; background:#e8d5ff; color:#5b2d91; padding:6px 14px; border-radius:16px; font-weight:bold; }
+  #game-title { font-size:clamp(20px,5vw,30px); color:#fff; font-weight:800; text-shadow:0 2px 0 #4a6fa5; }
+  #lvl-badge { font-size:15px; background:#e8d5ff; color:#5b2d91; padding:5px 14px; border-radius:16px; font-weight:bold; }
 
-  .gem-bar { display:flex; gap:10px; align-items:center; margin:2px 0; flex-wrap:wrap; justify-content:center; }
-  .hud-chip { font-size:18px; font-weight:bold; background:rgba(255,255,255,.8); padding:4px 14px; border-radius:16px; }
+  .gem-bar { display:flex; gap:10px; align-items:center; margin:0; flex-wrap:wrap; justify-content:center; }
+  .hud-chip { font-size:18px; font-weight:bold; background:rgba(255,255,255,.8); padding:3px 14px; border-radius:16px; }
   @keyframes pop { 0%{transform:scale(0);} 70%{transform:scale(1.4);} 100%{transform:scale(1);} }
 
   /* ---------- journey scene ---------- */
   .scene {
-    position:relative; width:100%; max-width:640px; height:100px;
+    position:relative; width:100%; max-width:660px; height:150px;
     border-radius:18px; overflow:hidden; border:3px solid #fff;
     box-shadow:0 6px 14px rgba(0,0,0,.15);
   }
-  .scene.pyr { background:linear-gradient(180deg,#aadcff 0%,#cfeaff 52%,#e0c98f 52%,#cdb072 100%); }
-  .scene.had { background:linear-gradient(180deg,#aadcff 0%,#d8f3c4 52%,#8fce6d 52%,#6fb54c 100%); }
-  .stone { position:absolute; bottom:10px; width:24px; height:13px; border-radius:50%;
+  .scene-bg { position:absolute; inset:0; width:100%; height:100%; }
+  .cloud {
+    position:absolute; left:0; width:56px; height:15px; background:#fff; border-radius:10px; opacity:.85;
+    animation:drift linear infinite;
+  }
+  .cloud::after { content:''; position:absolute; left:13px; top:-9px; width:26px; height:18px; background:#fff; border-radius:50%; }
+  @keyframes drift { from{transform:translateX(-90px);} to{transform:translateX(760px);} }
+  .stone { position:absolute; width:26px; height:13px; border-radius:50%;
     background:rgba(90,70,40,.35); transform:translateX(-50%); }
   .stone.reached { background:#ffd94d; box-shadow:0 0 6px 2px rgba(255,217,77,.7); }
-  .knight { position:absolute; bottom:22px; font-size:36px; z-index:5;
-    transition:left .7s ease; transform:translateX(-50%) scaleX(-1);
-    filter:drop-shadow(0 3px 3px rgba(0,0,0,.3)); }
+  .knight { position:absolute; width:52px; height:58px; z-index:5;
+    transition:left .7s ease, bottom .7s ease;
+    transform:translateX(-50%);
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.3));
+    animation:kbob 2.4s ease-in-out infinite; }
+  .knight svg { width:100%; height:100%; display:block; }
+  @keyframes kbob { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-4px);} }
   .knight.hop { animation:hop .7s ease; }
-  @keyframes hop { 50% { transform:translateX(-50%) scaleX(-1) translateY(-24px); } }
-  .obstacle { position:absolute; bottom:20px; font-size:32px; z-index:4;
-    transform:translateX(-50%); transition:transform .7s ease, opacity .7s ease; }
-  .obstacle.flee { transform:translateX(-50%) translateY(-70px) rotate(300deg); opacity:0; }
-  .goal { position:absolute; bottom:18px; font-size:34px; z-index:3; transform:translateX(-50%); animation:pulse 1.6s infinite; }
+  @keyframes hop { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-26px);} }
+  .obstacle { position:absolute; width:48px; height:48px; z-index:4;
+    transform:translateX(-50%); transition:transform .7s ease, opacity .7s ease;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.25)); }
+  .obstacle svg { width:100%; height:100%; display:block; }
+  .obstacle.flee { transform:translateX(-50%) translateY(-90px) rotate(300deg); opacity:0; }
+  .goal { position:absolute; width:42px; z-index:3; animation:gpulse 1.6s infinite; }
+  .goal svg { width:100%; height:auto; display:block; }
+  @keyframes gpulse { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.08);} }
 
   .instruction {
-    background:rgba(255,255,255,.85); border-radius:18px; padding:10px 16px;
-    font-size:clamp(15px,3.6vw,19px); text-align:center; max-width:640px;
+    background:rgba(255,255,255,.85); border-radius:18px; padding:8px 16px;
+    font-size:clamp(15px,3.6vw,19px); text-align:center; max-width:660px;
     display:flex; align-items:center; gap:10px;
   }
   .speak-btn { border:none; background:#dff0ff; border-radius:50%; width:44px; height:44px; font-size:22px; cursor:pointer; flex-shrink:0; box-shadow:0 3px 0 #9cc4e4; }
   .speak-btn:active { transform:translateY(2px); box-shadow:0 1px 0 #9cc4e4; }
 
-  #task-area { display:flex; flex-direction:column; align-items:center; gap:6px; margin:14px 0 6px; min-height:200px; justify-content:center; width:100%; }
+  #task-area { display:flex; flex-direction:column; align-items:center; gap:6px; margin:10px 0 4px; min-height:190px; justify-content:center; width:100%; }
 
   /* pyramid */
   .pyr-row { display:flex; gap:6px; justify-content:center; }
   .brick {
-    width:min(88px,19vw); height:min(60px,13vw);
+    width:min(88px,19vw); height:min(58px,13vw);
     display:flex; align-items:center; justify-content:center;
     font-size:clamp(20px,5vw,30px); font-weight:bold; color:#5c3a10;
     background:linear-gradient(180deg,#ffe1a8,#f0b860);
@@ -119,13 +151,13 @@
   /* snake */
   .snake { display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:4px; row-gap:14px; }
   .snake .seg {
-    width:min(70px,16vw); height:min(70px,16vw); border-radius:50%;
+    width:min(68px,15vw); height:min(68px,15vw); border-radius:50%;
     background:linear-gradient(180deg,#b6e388,#7cc24e); border:3px solid #4e8a26;
     display:flex; align-items:center; justify-content:center;
     font-size:clamp(20px,5vw,28px); font-weight:bold; color:#274d10;
     box-shadow:inset 0 -5px 0 rgba(0,0,0,.1);
   }
-  .snake .seg.head { background:linear-gradient(180deg,#8fd463,#59a82f); position:relative; }
+  .snake .seg.head { background:linear-gradient(180deg,#8fd463,#59a82f); }
   .snake .seg.missing { background:#fff; color:#e2544a; border:3px dashed #e2544a; animation:pulse 1.2s infinite; }
   .snake .op {
     font-size:clamp(16px,4vw,22px); font-weight:bold; color:#2b3a55;
@@ -136,10 +168,10 @@
   .snake-emoji { font-size:34px; margin-right:2px; }
 
   /* choices */
-  .choices { display:flex; gap:16px; justify-content:center; margin-top:14px; flex-wrap:wrap; }
+  .choices { display:flex; gap:16px; justify-content:center; margin-top:10px; flex-wrap:wrap; }
   .choice {
     font-family:inherit; font-size:clamp(26px,6vw,36px); font-weight:bold;
-    width:min(110px,26vw); height:min(84px,20vw);
+    width:min(110px,26vw); height:min(80px,19vw);
     border:none; border-radius:22px; cursor:pointer;
     background:linear-gradient(180deg,#9ad8ff,#4aa8e8); color:#083b63;
     box-shadow:0 6px 0 #2f7fb5, 0 10px 16px rgba(0,0,0,.15);
@@ -154,12 +186,15 @@
   /* toast */
   #toast {
     position:fixed; top:38%; left:50%; transform:translate(-50%,-50%) scale(0);
-    font-size:clamp(34px,8vw,56px); font-weight:bold; color:#fff;
+    font-size:clamp(34px,8vw,56px); font-weight:800; color:#fff;
     text-shadow:0 3px 0 #3f9e3f, 0 6px 14px rgba(0,0,0,.3);
     pointer-events:none; z-index:50; white-space:nowrap;
   }
   #toast.show { animation:toastIn .9s ease; }
   @keyframes toastIn { 0%{transform:translate(-50%,-50%) scale(0);} 30%{transform:translate(-50%,-50%) scale(1.15);} 60%{transform:translate(-50%,-50%) scale(1);} 100%{transform:translate(-50%,-70%) scale(1); opacity:0;} }
+
+  .fly-gem { position:fixed; z-index:60; font-size:30px; pointer-events:none;
+    transform:translate(-50%,-50%); transition:left .7s ease-in, top .7s ease-in, opacity .7s, font-size .7s; }
 
   /* overlay (story / medal / final) */
   #overlay {
@@ -168,25 +203,32 @@
   }
   #overlay.show { display:flex; }
   .panel {
-    background:#fffef5; border-radius:28px; padding:30px 26px; max-width:480px;
+    background:#fffef5; border-radius:28px; padding:28px 26px; max-width:480px;
     text-align:center; box-shadow:0 16px 40px rgba(0,0,0,.35);
     animation:panelIn .35s ease;
   }
   @keyframes panelIn { from{transform:scale(.7); opacity:0;} to{transform:scale(1); opacity:1;} }
-  .panel .big-emoji { font-size:70px; }
-  .panel h3 { font-size:26px; margin:10px 0; }
-  .panel p { font-size:18px; line-height:1.45; margin-bottom:18px; }
+  .panel .big-emoji { font-size:66px; }
+  .panel h3 { font-size:26px; margin:8px 0; }
+  .panel p { font-size:18px; line-height:1.45; margin-bottom:16px; }
 
   .confetti-piece { position:fixed; top:-40px; font-size:26px; z-index:99; animation:fall linear forwards; pointer-events:none; }
   @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
+
+  /* dragon wing flap */
+  .wing { transform-origin:60px 40px; animation:flap 1.6s ease-in-out infinite; }
+  @keyframes flap { 50% { transform:rotate(-14deg); } }
 </style>
 </head>
 <body>
 
 <!-- ============ TITLE ============ -->
 <div id="screen-title" class="screen active">
-  <div class="title-emoji">⚔️🛡️</div>
   <h1>Rytíř Čísel</h1>
+  <div class="hero">
+    <div id="hero-knight"></div>
+    <div id="hero-dragon"></div>
+  </div>
   <button class="big-btn" onclick="startGame()">Hrát</button>
   <button class="reset-link" onclick="resetProgress()">Smazat postup</button>
 </div>
@@ -195,21 +237,48 @@
 <div id="screen-map" class="screen">
   <h2>Mapa království</h2>
   <div class="gem-total">💎 <span id="total-gems">0</span> drahokamů</div>
-  <div class="map-grid">
-    <div class="world-card" onclick="openWorld('pyr')">
-      <div class="icon">🏔️</div>
+  <div class="map-wrap">
+    <svg class="map-bg" viewBox="0 0 900 560" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="skyM" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#8ecdf9"/><stop offset="1" stop-color="#d9efff"/>
+        </linearGradient>
+      </defs>
+      <rect width="900" height="560" fill="url(#skyM)"/>
+      <circle cx="80" cy="64" r="30" fill="#ffd94d"/>
+      <ellipse cx="690" cy="66" rx="48" ry="16" fill="#ffffff" opacity=".85"/>
+      <ellipse cx="300" cy="46" rx="42" ry="14" fill="#ffffff" opacity=".75"/>
+      <ellipse cx="180" cy="600" rx="540" ry="360" fill="#a8d68a"/>
+      <ellipse cx="780" cy="640" rx="580" ry="410" fill="#94c877"/>
+      <path d="M144 424 C 250 405 320 305 441 262 C 560 220 650 155 745 112"
+            stroke="#dcbc7e" stroke-width="34" fill="none" stroke-linecap="round"/>
+      <path d="M144 424 C 250 405 320 305 441 262 C 560 220 650 155 745 112"
+            stroke="#fff" stroke-width="4" fill="none" stroke-dasharray="16 14" opacity=".7"/>
+      <g fill="#3e8e41">
+        <path d="M700 372 l16 30 h-32 Z"/><path d="M700 392 l20 34 h-40 Z"/>
+        <path d="M240 190 l13 25 h-26 Z"/><path d="M240 206 l16 28 h-32 Z"/>
+        <path d="M560 420 l14 26 h-28 Z"/><path d="M560 436 l17 30 h-34 Z"/>
+      </g>
+      <rect x="696" y="424" width="8" height="12" fill="#8a5a2b"/>
+      <rect x="236" y="232" width="7" height="10" fill="#8a5a2b"/>
+      <rect x="556" y="464" width="8" height="11" fill="#8a5a2b"/>
+      <ellipse cx="420" cy="480" rx="34" ry="12" fill="#8cc06a"/>
+      <ellipse cx="120" cy="250" rx="30" ry="11" fill="#8cc06a"/>
+    </svg>
+    <div class="map-node" style="left:16%; top:74%;" onclick="openWorld('pyr')">
+      <div class="node-icon"><svg viewBox="0 0 80 60"><polygon points="4,56 30,14 56,56" fill="#8fa8c4"/><polygon points="30,14 20,30 40,30" fill="#fff"/><polygon points="36,56 58,24 78,56" fill="#7d97b8"/><polygon points="58,24 51,36 65,36" fill="#fff"/><rect x="29" y="2" width="2.5" height="14" fill="#8a5a2b"/><path d="M31.5 2 h12 l-4 4 4 4 h-12 Z" fill="#e2544a"/></svg></div>
       <h3>Pyramidová hora</h3>
       <div class="medals" id="medals-pyr"></div>
       <div class="lvl" id="map-lvl-pyr"></div>
     </div>
-    <div class="world-card" onclick="openWorld('had')">
-      <div class="icon">🐍</div>
+    <div class="map-node" style="left:49%; top:46%;" onclick="openWorld('had')">
+      <div class="node-icon"><svg viewBox="0 0 80 60"><g transform="translate(24,8)"><rect x="-3" width="6" height="44" rx="3" fill="#8a5a2b"/><ellipse rx="18" ry="6" transform="rotate(-28)" fill="#3e8e41"/><ellipse rx="18" ry="6" transform="rotate(28)" fill="#4aa04e"/><ellipse rx="14" ry="5" transform="rotate(88)" fill="#357a38"/></g><path d="M40 52 q8 -10 16 0 q8 10 16 0" stroke="#5fae55" stroke-width="7" fill="none" stroke-linecap="round"/><circle cx="72" cy="49" r="4.5" fill="#5fae55"/><circle cx="73.5" cy="48" r="1.4" fill="#222"/></svg></div>
       <h3>Hadí údolí</h3>
       <div class="medals" id="medals-had"></div>
       <div class="lvl" id="map-lvl-had"></div>
     </div>
-    <div class="world-card" id="tower-card" onclick="openTower()">
-      <div class="icon">🏰</div>
+    <div class="map-node" id="tower-card" style="left:82%; top:21%;" onclick="openTower()">
+      <div class="node-icon"><svg viewBox="0 0 80 72"><rect x="24" y="20" width="32" height="48" rx="4" fill="#9aa3ad"/><rect x="22" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="36" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="50" y="14" width="8" height="10" fill="#9aa3ad"/><rect x="34" y="46" width="12" height="22" rx="6" fill="#4a3a5a"/><rect x="37" y="2" width="2.5" height="14" fill="#8a5a2b"/><path d="M39.5 2 h13 l-4 4 4 4 h-13 Z" fill="#5b2d91"/><circle cx="40" cy="34" r="5" fill="#2b3a55"/><circle cx="40" cy="34" r="3" fill="#7ee0e8"/></svg></div>
       <h3>Dračí věž</h3>
       <div class="medals" id="tower-status">🔒</div>
       <div class="lvl">Získej medaili z obou světů!</div>
@@ -242,12 +311,90 @@
     <div class="big-emoji" id="ov-emoji">🐉</div>
     <h3 id="ov-title"></h3>
     <p id="ov-text"></p>
-    <button class="big-btn" style="font-size:22px; padding:12px 40px;" id="ov-btn">Pokračovat</button>
+    <button class="big-btn" style="font-size:22px; padding:10px 40px;" id="ov-btn">Pokračovat</button>
   </div>
 </div>
 
 <script>
 'use strict';
+
+/* ================= SVG art ================= */
+const KNIGHT_SVG = `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
+<path d="M24 30 Q8 44 15 60 Q26 54 28 42 Z" fill="#c0392b"/>
+<rect x="26" y="50" width="7" height="16" rx="3.5" fill="#44546b"/>
+<rect x="35" y="50" width="7" height="16" rx="3.5" fill="#44546b"/>
+<rect x="24" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/>
+<rect x="34" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/>
+<rect x="22" y="28" width="24" height="26" rx="9" fill="#5b7fd4"/>
+<rect x="22" y="28" width="24" height="11" rx="5.5" fill="#7396e8"/>
+<rect x="42" y="32" width="13" height="6" rx="3" fill="#7396e8"/>
+<rect x="51" y="8" width="5" height="28" rx="2.5" fill="#dbe4ee"/>
+<rect x="46" y="33" width="15" height="5" rx="2.5" fill="#d4a017"/>
+<circle cx="53.5" cy="42" r="3.5" fill="#d4a017"/>
+<circle cx="21" cy="42" r="9.5" fill="#e2b007"/>
+<circle cx="21" cy="42" r="6" fill="#f6d14d"/>
+<circle cx="34" cy="18" r="10" fill="#f5c9a0"/>
+<path d="M24 18 a10 10 0 0 1 20 0 l0 3 h-4 v-3 h-12 v3 h-4 Z" fill="#9fb2c8"/>
+<path d="M34 5 Q28 0 24 4 Q29 6 31 10 Z" fill="#c0392b"/>
+<circle cx="38" cy="20" r="1.7" fill="#2b3a55"/>
+<path d="M35 24 q3 2.5 6 0" stroke="#c98a6b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+</svg>`;
+
+const DRAGON_SVG = `<svg viewBox="0 0 100 84" xmlns="http://www.w3.org/2000/svg">
+<path d="M78 58 q16 2 18 -10 q-10 0 -14 4 Z" fill="#4e9b47"/>
+<g class="wing"><path d="M56 34 Q84 8 90 32 Q74 36 62 44 Z" fill="#3c7a36"/></g>
+<ellipse cx="52" cy="56" rx="26" ry="20" fill="#59b559"/>
+<ellipse cx="46" cy="62" rx="15" ry="11" fill="#bde6a8"/>
+<path d="M34 40 l6 -8 6 8 Z" fill="#3c7a36"/>
+<path d="M46 36 l6 -8 6 8 Z" fill="#3c7a36"/>
+<circle cx="26" cy="30" r="15" fill="#59b559"/>
+<ellipse cx="13" cy="35" rx="9" ry="6.5" fill="#6fc46f"/>
+<circle cx="10" cy="34" r="1.3" fill="#2b3a55"/>
+<path d="M18 16 l-3 -9 7 4 Z" fill="#f2e2b0"/>
+<path d="M28 14 l1 -10 5 8 Z" fill="#f2e2b0"/>
+<circle cx="24" cy="26" r="5" fill="#fff"/><circle cx="32" cy="27" r="4.4" fill="#fff"/>
+<circle cx="25" cy="27" r="2.4" fill="#222"/><circle cx="32.5" cy="28" r="2.1" fill="#222"/>
+<path d="M52 74 l-2 8 M62 74 l2 8" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/>
+</svg>`;
+
+const OBS_SVG = {
+troll:`<svg viewBox="0 0 64 64"><rect x="44" y="18" width="8" height="34" rx="4" fill="#8a5a2b" transform="rotate(18 48 35)"/><circle cx="48" cy="16" r="7" fill="#7a4a1f"/><ellipse cx="30" cy="42" rx="19" ry="17" fill="#6da84e"/><circle cx="16" cy="22" r="4" fill="#7cbf5a"/><circle cx="44" cy="22" r="4" fill="#7cbf5a"/><circle cx="30" cy="22" r="13" fill="#7cbf5a"/><circle cx="25" cy="20" r="4" fill="#fff"/><circle cx="35" cy="20" r="4" fill="#fff"/><circle cx="26" cy="21" r="2" fill="#222"/><circle cx="34" cy="21" r="2" fill="#222"/><path d="M20 13 l8 4 M40 13 l-8 4" stroke="#3f6f2a" stroke-width="2.5" stroke-linecap="round"/><path d="M23 29 q7 5 14 0 Z" fill="#4a3020"/><rect x="25" y="28" width="4" height="4" rx="1" fill="#fff"/><rect x="31" y="28" width="4" height="4" rx="1" fill="#fff"/></svg>`,
+boulder:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="57" rx="22" ry="4" fill="#000" opacity=".13"/><path d="M12 50 Q6 30 20 20 Q34 8 48 20 Q60 30 54 46 Q48 58 30 56 Q16 56 12 50 Z" fill="#9aa3ad"/><path d="M22 24 L34 30 L30 42" stroke="#7c858f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M40 22 L44 34" stroke="#7c858f" stroke-width="3" stroke-linecap="round"/></svg>`,
+eagle:`<svg viewBox="0 0 64 64"><path d="M6 20 Q20 6 32 22 Q44 6 58 20 Q44 22 36 28 Q30 32 28 28 Q20 22 6 20 Z" fill="#8a5a2b"/><ellipse cx="32" cy="36" rx="10" ry="13" fill="#a06a35"/><circle cx="32" cy="22" r="8" fill="#f4f0e6"/><circle cx="34.5" cy="21" r="1.8" fill="#222"/><path d="M39 23 l7 2.5 -7 2.5 Z" fill="#e8a423"/><path d="M26 48 l3 6 M32 49 l0 7 M38 48 l-3 6" stroke="#e8a423" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+croc:`<svg viewBox="0 0 64 64"><ellipse cx="40" cy="44" rx="20" ry="12" fill="#4e9b47"/><path d="M56 40 q8 -6 6 -14 q-6 4 -10 8 Z" fill="#4e9b47"/><ellipse cx="18" cy="40" rx="16" ry="8" fill="#5fae55"/><path d="M8 44 l3 -4 3 4 3 -4 3 4 3 -4 3 4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="#5fae55"/><circle cx="30" cy="29" r="2" fill="#222"/><path d="M30 38 l4 -5 4 5 4 -5 4 5" fill="#3c7a36"/><path d="M34 52 l2 6 M44 52 l0 7 M52 48 l3 6" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/></svg>`,
+river:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="46" rx="28" ry="14" fill="#4aa8e8"/><path d="M8 44 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0" stroke="#bfe4ff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 52 q5 -4 10 0 q5 4 10 0 q5 -4 10 0" stroke="#8fd0ff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M26 28 q6 -12 12 0 q-6 -4 -12 0 Z" fill="#4aa8e8" opacity=".8"/></svg>`,
+spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v18" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`
+};
+
+const GOAL_SVG = {
+pyr:`<svg viewBox="0 0 48 64"><rect x="21" y="8" width="4" height="52" rx="2" fill="#8a5a2b"/><path d="M25 8 h20 l-6 8 6 8 h-20 Z" fill="#e2544a"/><circle cx="23" cy="6" r="4" fill="#ffd94d"/></svg>`,
+had:`<svg viewBox="0 0 64 56"><circle cx="20" cy="16" r="3" fill="#7ee0e8"/><circle cx="44" cy="14" r="3" fill="#f78fb3"/><circle cx="32" cy="10" r="3" fill="#9ff0a0"/><rect x="8" y="22" width="48" height="28" rx="6" fill="#8a5a2b"/><path d="M8 30 a24 14 0 0 1 48 0 v2 h-48 Z" fill="#a06a35"/><rect x="8" y="30" width="48" height="5" fill="#6b4423"/><rect x="27" y="27" width="10" height="12" rx="2" fill="#ffd94d"/><circle cx="32" cy="34" r="2" fill="#8a5a2b"/></svg>`
+};
+
+const SCENE_BG = {
+pyr:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
+<defs><linearGradient id="skyP" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff"/><stop offset="1" stop-color="#dff0ff"/></linearGradient></defs>
+<rect width="640" height="140" fill="url(#skyP)"/>
+<circle cx="570" cy="26" r="16" fill="#ffd94d"/>
+<polygon points="-20,92 90,26 200,92" fill="#8fa8c4"/><polygon points="90,26 68,42 112,42" fill="#fff"/>
+<polygon points="150,96 270,14 390,96" fill="#7d97b8"/><polygon points="270,14 242,36 298,36" fill="#fff"/>
+<polygon points="340,94 450,34 560,94" fill="#8fa8c4"/><polygon points="450,34 428,50 472,50" fill="#fff"/>
+<rect y="88" width="640" height="52" fill="#dcbc7e"/>
+<rect y="88" width="640" height="6" fill="#c7a25f"/>
+</svg>`,
+had:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
+<defs><linearGradient id="skyH" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff"/><stop offset="1" stop-color="#e8f7dc"/></linearGradient></defs>
+<rect width="640" height="140" fill="url(#skyH)"/>
+<circle cx="66" cy="26" r="16" fill="#ffd94d"/>
+<ellipse cx="140" cy="96" rx="150" ry="34" fill="#9fce7d"/>
+<ellipse cx="460" cy="98" rx="190" ry="40" fill="#8cc06a"/>
+<g transform="translate(120,42)"><rect x="-3" width="6" height="52" rx="3" fill="#8a5a2b"/><ellipse rx="20" ry="6" transform="rotate(-28)" fill="#3e8e41"/><ellipse rx="20" ry="6" transform="rotate(28)" fill="#4aa04e"/><ellipse rx="16" ry="5" transform="rotate(88)" fill="#357a38"/></g>
+<g transform="translate(370,56) scale(0.75)"><rect x="-3" width="6" height="52" rx="3" fill="#8a5a2b"/><ellipse rx="20" ry="6" transform="rotate(-28)" fill="#3e8e41"/><ellipse rx="20" ry="6" transform="rotate(28)" fill="#4aa04e"/><ellipse rx="16" ry="5" transform="rotate(88)" fill="#357a38"/></g>
+<g transform="translate(590,44) scale(0.9)"><rect x="-3" width="6" height="52" rx="3" fill="#8a5a2b"/><ellipse rx="20" ry="6" transform="rotate(-28)" fill="#3e8e41"/><ellipse rx="20" ry="6" transform="rotate(28)" fill="#4aa04e"/><ellipse rx="16" ry="5" transform="rotate(88)" fill="#357a38"/></g>
+<rect y="94" width="640" height="46" fill="#79b95c"/>
+<rect y="94" width="640" height="6" fill="#61a047"/>
+</svg>`
+};
 
 /* ================= state ================= */
 const DEFAULT_STATE = {
@@ -349,7 +496,7 @@ function goMap(){
   document.getElementById('total-gems').textContent = S.gems.pyr + S.gems.had;
   for (const w of ['pyr','had']){
     const medals = Math.floor(S.gems[w]/10);
-    document.getElementById('medals-'+w).textContent = medals ? '🏅'.repeat(Math.min(medals,5)) + (medals>5?' ×'+medals:'') : '— zatím bez medaile —';
+    document.getElementById('medals-'+w).textContent = medals ? '🏅'.repeat(Math.min(medals,4)) + (medals>4?' ×'+medals:'') : '—';
     document.getElementById('map-lvl-'+w).textContent = 'Kouzlo úrovně ' + S.level[w];
   }
   const unlocked = S.gems.pyr >= 10 && S.gems.had >= 10;
@@ -394,28 +541,26 @@ const WORLDS = {
   pyr: {
     name:'Pyramidová hora',
     instruction:'Každá cihla je součtem dvou cihel pod ní. Jaké číslo patří místo otazníku?',
-    goal:'🚩',
     introEmoji:'🏔️',
     introTitle:'Kapitola 1: Pyramidová hora',
     intro:'Na vrcholu hory svítí ukradený drahokam! Vyprav se po horské stezce až nahoru. Každý vyřešený úkol tě posune o jeden krok. Ale pozor — cestu hlídá troll!',
     obstacles:{
-      3:{e:'🧌', toast:'Troll utekl!', say:'Troll se lekl tvého počítání a utekl!'},
-      6:{e:'🪨', toast:'Balvan odvalen!', say:'Kouzlem čísel jsi odvalil obrovský balvan z cesty!'},
-      9:{e:'🦅', toast:'Orel odletěl!', say:'Dračí orel dostal strach a odletěl pryč!'}
+      3:{svg:'troll', toast:'Troll utekl!', say:'Troll se lekl tvého počítání a utekl!'},
+      6:{svg:'boulder', toast:'Balvan odvalen!', say:'Kouzlem čísel jsi odvalil obrovský balvan z cesty!'},
+      9:{svg:'eagle', toast:'Orel odletěl!', say:'Dračí orel dostal strach a odletěl pryč!'}
     },
     goalStory:'Vystoupal jsi až na vrchol Pyramidové hory a zachránil drahokam! Získáváš zlatou medaili.'
   },
   had: {
     name:'Hadí údolí',
     instruction:'Had počítá od hlavy k ocásku. Jaké číslo patří místo otazníku?',
-    goal:'💰',
     introEmoji:'🐍',
     introTitle:'Kapitola 2: Hadí údolí',
     intro:'Hadí král schoval na konci údolí truhlu plnou drahokamů! Projdi džunglí až k pokladu. Každý vyřešený úkol tě posune o jeden krok. Ale pozor na krokodýla!',
     obstacles:{
-      3:{e:'🐊', toast:'Krokodýl zmizel!', say:'Krokodýl se ponořil a uplaval pryč!'},
-      6:{e:'🌊', toast:'Řeka přeskočena!', say:'Čísla ti postavila most přes divokou řeku!'},
-      9:{e:'🕷️', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
+      3:{svg:'croc', toast:'Krokodýl zmizel!', say:'Krokodýl se ponořil a uplaval pryč!'},
+      6:{svg:'river', toast:'Řeka přeskočena!', say:'Čísla ti postavila most přes divokou řeku!'},
+      9:{svg:'spider', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
     },
     goalStory:'Došel jsi na konec Hadího údolí a našel poklad hadího krále! Získáváš zlatou medaili.'
   }
@@ -462,46 +607,42 @@ function renderGems(){
 /* ---------- journey scene ---------- */
 let knightEl = null;
 let obstacleEls = {};
+const SLOT_B = [16,22,28,24,18,22,28,32,26,20,24];
 function slotLeft(i){ return (4 + i*9.2) + '%'; }
 function knightPos(){ return S.gems[currentWorld] % 10; }
 function renderScene(){
   const w = currentWorld;
   const scene = document.getElementById('scene');
   scene.className = 'scene ' + w;
-  scene.innerHTML = '';
-  obstacleEls = {};
   const pos = knightPos();
+  let html = SCENE_BG[w];
+  html += '<span class="cloud" style="top:8px; animation-duration:34s;"></span>';
+  html += '<span class="cloud" style="top:28px; animation-duration:52s; animation-delay:-26s;"></span>';
   for (let i=0; i<=10; i++){
-    const s = document.createElement('div');
-    s.className = 'stone' + (i <= pos ? ' reached' : '');
-    s.style.left = slotLeft(i);
-    scene.appendChild(s);
+    html += '<div class="stone' + (i <= pos ? ' reached' : '') + '" style="left:' + slotLeft(i) + '; bottom:' + SLOT_B[i] + 'px"></div>';
   }
-  const goal = document.createElement('div');
-  goal.className = 'goal';
-  goal.style.left = slotLeft(10);
-  goal.textContent = WORLDS[w].goal;
-  scene.appendChild(goal);
+  html += '<div class="goal" style="left:' + slotLeft(10) + '; bottom:' + (SLOT_B[10]+10) + 'px">' + GOAL_SVG[w] + '</div>';
   for (const [slot, cfg] of Object.entries(WORLDS[w].obstacles)){
     if (Number(slot) > pos){
-      const o = document.createElement('div');
-      o.className = 'obstacle';
-      o.style.left = slotLeft(Number(slot));
-      o.textContent = cfg.e;
-      scene.appendChild(o);
-      obstacleEls[slot] = o;
+      html += '<div class="obstacle" id="ob-' + slot + '" style="left:' + slotLeft(Number(slot)) + '; bottom:' + (SLOT_B[slot]+8) + 'px">' + OBS_SVG[cfg.svg] + '</div>';
     }
   }
-  knightEl = document.createElement('div');
-  knightEl.className = 'knight';
-  knightEl.style.left = slotLeft(pos);
-  knightEl.textContent = '🤺';
-  scene.appendChild(knightEl);
+  html += '<div class="knight" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + KNIGHT_SVG + '</div>';
+  scene.innerHTML = html;
+  knightEl = document.getElementById('knight');
+  if (knightEl && knightEl.addEventListener){
+    knightEl.addEventListener('animationend', () => knightEl.classList.remove('hop'));
+  }
+  obstacleEls = {};
+  for (const slot of Object.keys(WORLDS[w].obstacles)){
+    if (Number(slot) > pos) obstacleEls[slot] = document.getElementById('ob-'+slot);
+  }
 }
 function moveKnight(pos){
   if (!knightEl) return 0;
   playStep();
   knightEl.style.left = slotLeft(pos);
+  knightEl.style.bottom = (SLOT_B[pos]+10) + 'px';
   knightEl.classList.remove('hop');
   void knightEl.offsetWidth;
   knightEl.classList.add('hop');
@@ -659,6 +800,7 @@ function answer(btn, val){
   if (val === currentTask.answer){
     inputLocked = true;
     playCorrect();
+    flyGem();
     toast(pick(PRAISE));
     S.gems[w]++;
     if (missesThisTask >= 2){ S.failStreak[w]++; }
@@ -714,6 +856,25 @@ function toast(msg){
   void t.offsetWidth;
   t.classList.add('show');
 }
+function flyGem(){
+  if (typeof requestAnimationFrame === 'undefined') return;
+  const area = document.getElementById('task-area'), bar = document.getElementById('gem-bar');
+  if (!area || !bar || !area.getBoundingClientRect) return;
+  const a = area.getBoundingClientRect(), b = bar.getBoundingClientRect();
+  const g = document.createElement('div');
+  g.className = 'fly-gem';
+  g.textContent = '💎';
+  g.style.left = (a.left + a.width/2) + 'px';
+  g.style.top = (a.top + a.height/2) + 'px';
+  document.body.appendChild(g);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    g.style.left = (b.left + b.width/2) + 'px';
+    g.style.top = (b.top + b.height/2) + 'px';
+    g.style.fontSize = '14px';
+    g.style.opacity = '.25';
+  }));
+  setTimeout(() => g.remove(), 800);
+}
 function confetti(){
   const emojis = ['🎉','⭐','💎','🎊','✨','🏅'];
   for (let i=0; i<36; i++){
@@ -727,6 +888,10 @@ function confetti(){
     setTimeout(() => p.remove(), 4200);
   }
 }
+
+/* ================= boot ================= */
+document.getElementById('hero-knight').innerHTML = KNIGHT_SVG;
+document.getElementById('hero-dragon').innerHTML = DRAGON_SVG;
 </script>
 </body>
 </html>
