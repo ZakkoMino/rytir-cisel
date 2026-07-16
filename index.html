@@ -129,6 +129,37 @@
   .goal svg { width:100%; height:auto; display:block; }
   @keyframes gpulse { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.08);} }
 
+  /* ---------- dragon boss battle ---------- */
+  .hp-row { position:absolute; top:6px; left:0; width:100%; text-align:center; z-index:6; }
+  .hp-orb { font-size:20px; margin:0 2px; display:inline-block; }
+  .hp-orb.lost { filter:grayscale(1); opacity:.3; }
+  .boss-knight { position:absolute; left:11%; bottom:14px; width:60px; height:66px; z-index:5;
+    filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); animation:kbob 2.4s ease-in-out infinite; }
+  .boss-knight svg { width:100%; height:100%; display:block; }
+  .boss-knight.attack { animation:lunge .55s ease; }
+  @keyframes lunge { 45% { transform:translateX(52px); } }
+  .boss-dragon { position:absolute; right:5%; bottom:8px; width:118px; z-index:5;
+    filter:drop-shadow(0 3px 4px rgba(0,0,0,.4)); animation:hover 3s ease-in-out infinite; }
+  .boss-dragon svg { width:100%; height:auto; display:block; }
+  .boss-dragon.hit { animation:dshake .55s ease; }
+  @keyframes dshake { 20%{transform:translateX(9px) rotate(3deg);} 40%{transform:translateX(-9px);}
+    60%{transform:translateX(6px) rotate(-2deg);} 80%{transform:translateX(-4px);} }
+  .breath { position:absolute; right:23%; bottom:58px; width:54px; z-index:4; opacity:0; transition:opacity .25s; }
+  .breath.on { opacity:1; }
+  .breath svg { width:100%; height:auto; display:block; }
+
+  /* dragon spell equation */
+  .eq { display:flex; gap:10px; align-items:center; justify-content:center; flex-wrap:wrap; }
+  .eq .chip {
+    min-width:min(70px,16vw); height:min(70px,16vw); padding:0 12px; border-radius:18px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:clamp(24px,6vw,36px); font-weight:bold; color:#3d1f66;
+    background:linear-gradient(180deg,#e8d5ff,#c9a8f0); border:3px solid #8a5fc0;
+    box-shadow:inset 0 -5px 0 rgba(0,0,0,.08);
+  }
+  .eq .chip.missing { background:#fff; color:#e2544a; border:3px dashed #e2544a; animation:pulse 1.2s infinite; }
+  .eq .eq-equals { font-size:clamp(28px,7vw,40px); font-weight:bold; color:#e8d5ff; text-shadow:0 2px 0 rgba(0,0,0,.25); }
+
   .instruction {
     background:rgba(255,255,255,.85); border-radius:18px; padding:8px 16px;
     font-size:clamp(15px,3.6vw,19px); text-align:center; max-width:660px;
@@ -400,8 +431,26 @@ had:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
 <g transform="translate(590,44) scale(0.9)"><rect x="-3" width="6" height="52" rx="3" fill="#8a5a2b"/><ellipse rx="20" ry="6" transform="rotate(-28)" fill="#3e8e41"/><ellipse rx="20" ry="6" transform="rotate(28)" fill="#4aa04e"/><ellipse rx="16" ry="5" transform="rotate(88)" fill="#357a38"/></g>
 <rect y="94" width="640" height="46" fill="#79b95c"/>
 <rect y="94" width="640" height="6" fill="#61a047"/>
+</svg>`,
+drak:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
+<defs><linearGradient id="skyD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241f3d"/><stop offset="1" stop-color="#5a4a86"/></linearGradient></defs>
+<rect width="640" height="140" fill="url(#skyD)"/>
+<circle cx="84" cy="28" r="15" fill="#f4f0d8"/><circle cx="92" cy="24" r="13" fill="#241f3d"/>
+<circle cx="200" cy="18" r="1.6" fill="#fff"/><circle cx="300" cy="34" r="1.3" fill="#fff"/>
+<circle cx="410" cy="14" r="1.6" fill="#fff"/><circle cx="520" cy="30" r="1.3" fill="#fff"/>
+<circle cx="600" cy="12" r="1.5" fill="#fff"/><circle cx="150" cy="46" r="1.2" fill="#fff"/>
+<rect x="0" y="30" width="52" height="90" fill="#332b52"/>
+<path d="M0 30 h12 v-10 h10 v10 h12 v-10 h10 v10 h8 v14 h-52 Z" fill="#332b52"/>
+<rect x="16" y="60" width="12" height="16" rx="5" fill="#ffd94d" opacity=".8"/>
+<rect x="588" y="24" width="52" height="96" fill="#332b52"/>
+<path d="M588 24 h12 v-10 h10 v10 h12 v-10 h10 v10 h8 v14 h-52 Z" fill="#332b52"/>
+<rect x="612" y="56" width="12" height="16" rx="5" fill="#ffd94d" opacity=".8"/>
+<rect y="112" width="640" height="28" fill="#3a3156"/>
+<rect y="112" width="640" height="5" fill="#2e2745"/>
 </svg>`
 };
+
+const FLAME_SVG = `<svg viewBox="0 0 40 24"><path d="M40 12 Q26 2 2 8 Q10 12 2 16 Q26 22 40 12 Z" fill="#ff8c42"/><path d="M34 12 Q24 7 10 10 Q14 12 10 14 Q24 17 34 12 Z" fill="#ffd94d"/></svg>`;
 
 /* ================= state ================= */
 const DEFAULT_STATE = {
@@ -468,6 +517,8 @@ function playCorrect(){ tone(523,0,.15); tone(659,.13,.15); tone(784,.26,.3); }
 function playStep(){ tone(440,0,.08,'triangle',.08); tone(554,.1,.1,'triangle',.08); }
 function playFlee(){ tone(880,0,.1); tone(740,.1,.1); tone(587,.2,.1); tone(440,.3,.2); }
 function playWrong(){ tone(196,0,.3,'triangle',.12); }
+function playHit(){ tone(1200,0,.07,'triangle',.1); tone(170,.04,.14,'square',.14); tone(90,.1,.2,'sawtooth',.1); }
+function playRoar(){ tone(300,0,.15,'sawtooth',.1); tone(220,.12,.2,'sawtooth',.1); tone(150,.28,.35,'sawtooth',.09); }
 function playClick(){ tone(600,0,.06,'square',.05); }
 function playFanfare(){ tone(523,0,.18); tone(659,.15,.18); tone(784,.3,.18); tone(1047,.45,.5); }
 
@@ -521,11 +572,7 @@ function openTower(){
       'Rozumím', null, false);
     return;
   }
-  S.dragonBeaten = true; saveState();
-  playFanfare(); confetti();
-  showPanel('👑','Drak je poražen!',
-    'Dokázal jsi to! Drak Chaos utekl a kouzelná čísla jsou zachráněna. Jsi opravdový Rytíř Čísel! Můžeš dál sbírat drahokamy a medaile.',
-    'Hurá!', null, true);
+  startBossBattle();
 }
 function showPanel(emoji, title, text, btnLabel, onClose, doSpeak){
   document.getElementById('ov-emoji').textContent = emoji;
@@ -570,6 +617,11 @@ const WORLDS = {
       9:{svg:'spider', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
     },
     goalStory:'Došel jsi na konec Hadího údolí a našel poklad hadího krále! Získáváš zlatou medaili.'
+  },
+  drak: {
+    name:'Dračí věž',
+    instruction:'Rozbij drakovo kouzlo! Jaké číslo nebo znaménko patří místo otazníku?',
+    obstacles:{}
   }
 };
 let currentWorld = null;
@@ -668,6 +720,99 @@ function moveKnight(pos){
   return 0;
 }
 
+/* ---------- dragon boss battle ---------- */
+const BOSS_MAX = 8;
+let bossHP = BOSS_MAX;
+function startBossBattle(){
+  currentWorld = 'drak';
+  bossHP = BOSS_MAX;
+  document.getElementById('game-title').textContent = WORLDS.drak.name;
+  document.getElementById('instruction-text').textContent = WORLDS.drak.instruction;
+  show('screen-game');
+  newTask();
+  showPanel('🐉',
+    S.dragonBeaten ? 'Odveta!' : 'Souboj s drakem!',
+    S.dragonBeaten
+      ? 'Drak Chaos se vrátil a chce odvetu! Rozbij znovu všech osm jeho kouzel a zažeň ho z věže!'
+      : 'Drak Chaos tě vyzývá na souboj! Chrání ho osm ohnivých kouzel. Rozbij je všechna a zažeň ho z věže!',
+    'Do boje!', null, true);
+}
+function genDragon(hits){
+  const max = hits < 3 ? 10 : 20;
+  const plus = Math.random() < 0.5;
+  let a, b, c;
+  if (plus){ a = randInt(1, max-1); b = randInt(1, max-a); c = a + b; }
+  else { a = randInt(2, max); b = randInt(1, a-1); c = a - b; }
+  const sign = plus ? '+' : '−';
+  if (Math.random() < 0.5){
+    return { kind:'drak', eq:[a, sign, b, '=', c], missIdx:1,
+      answer:sign, choices:['+','−'],
+      hint: plus ? 'Výsledek je větší než první číslo — čísla se sčítají.'
+                 : 'Výsledek je menší než první číslo — čísla se odčítají.' };
+  }
+  const missIdx = pick([0, 2, 4]);
+  const eq = [a, sign, b, '=', c];
+  return { kind:'drak', eq, missIdx, answer:eq[missIdx],
+    hint: missIdx === 4 ? 'Spočítej příklad od začátku k otazníku.'
+                        : 'Zkus dosadit čísla z nabídky — které sedí?' };
+}
+function renderBossHud(){
+  const bar = document.getElementById('gem-bar');
+  bar.innerHTML = '';
+  const chip = document.createElement('span');
+  chip.className = 'hud-chip';
+  chip.textContent = '🐉 Zbývá kouzel: ' + bossHP;
+  bar.appendChild(chip);
+  document.getElementById('lvl-badge').textContent = '⚔️ Souboj';
+}
+function renderBossScene(){
+  const scene = document.getElementById('scene');
+  scene.className = 'scene drak';
+  let html = SCENE_BG.drak;
+  html += '<div class="hp-row" id="hp-row"></div>';
+  html += '<div class="breath" id="breath">' + FLAME_SVG + '</div>';
+  html += '<div class="boss-knight" id="boss-knight">' + KNIGHT_SVG + '</div>';
+  html += '<div class="boss-dragon" id="boss-dragon">' + DRAGON_SVG + '</div>';
+  scene.innerHTML = html;
+  renderHpOrbs();
+}
+function renderHpOrbs(){
+  const row = document.getElementById('hp-row');
+  if (!row) return;
+  let html = '';
+  for (let i=0; i<BOSS_MAX; i++) html += '<span class="hp-orb' + (i < bossHP ? '' : ' lost') + '">🔥</span>';
+  row.innerHTML = html;
+}
+function dragonBreath(){
+  const br = document.getElementById('breath');
+  if (!br || !br.classList) return;
+  br.classList.add('on');
+  playRoar();
+  setTimeout(() => br.classList.remove('on'), 700);
+}
+function bossHit(){
+  inputLocked = true;
+  bossHP--;
+  playHit();
+  const k = document.getElementById('boss-knight'), d = document.getElementById('boss-dragon');
+  if (k && k.classList){ k.classList.remove('attack'); void k.offsetWidth; k.classList.add('attack'); }
+  setTimeout(() => { if (d && d.classList) d.classList.add('hit'); }, 250);
+  renderHpOrbs();
+  renderBossHud();
+  if (bossHP <= 0){
+    setTimeout(() => {
+      S.dragonBeaten = true; saveState();
+      playFanfare(); confetti();
+      showPanel('👑','Drak je poražen!',
+        'Rozbil jsi všechna drakova kouzla! Drak Chaos s řevem uletěl a kouzelná čísla jsou navždy v bezpečí. Jsi opravdový Rytíř Čísel!',
+        'Hurá!', goMap, true);
+    }, 1100);
+  } else {
+    toast(pick(PRAISE));
+    setTimeout(newTask, 1300);
+  }
+}
+
 /* ================= task generation ================= */
 function genPyramid(level){
   const cfg = [null,
@@ -736,6 +881,14 @@ function genSnake(level){
 function newTask(){
   missesThisTask = 0;
   inputLocked = false;
+  if (currentWorld === 'drak'){
+    currentTask = genDragon(BOSS_MAX - bossHP);
+    renderBossHud();
+    renderBossScene();
+    renderTask();
+    renderChoices();
+    return;
+  }
   currentTask = currentWorld === 'pyr' ? genPyramid(S.level.pyr) : genSnake(S.level.had);
   renderGems();
   renderScene();
@@ -746,6 +899,19 @@ function renderTask(){
   const area = document.getElementById('task-area');
   area.innerHTML = '';
   const t = currentTask;
+  if (t.kind === 'drak'){
+    const eq = document.createElement('div');
+    eq.className = 'eq';
+    t.eq.forEach((v,i) => {
+      const ch = document.createElement('div');
+      if (v === '='){ ch.className = 'eq-equals'; ch.textContent = '='; }
+      else if (i === t.missIdx){ ch.className = 'chip missing'; ch.textContent = '?'; }
+      else { ch.className = 'chip'; ch.textContent = v; }
+      eq.appendChild(ch);
+    });
+    area.appendChild(eq);
+    return;
+  }
   if (t.kind === 'pyr'){
     for (let r = t.rows.length-1; r >= 0; r--){
       const row = document.createElement('div');
@@ -789,7 +955,8 @@ function renderTask(){
 function renderChoices(){
   const box = document.getElementById('choices');
   box.innerHTML = '';
-  makeChoices(currentTask.answer).forEach(v => {
+  const opts = currentTask.choices ? shuffle([...currentTask.choices]) : makeChoices(currentTask.answer);
+  opts.forEach(v => {
     const b = document.createElement('button');
     b.className = 'choice';
     b.textContent = v;
@@ -805,6 +972,11 @@ function answer(btn, val){
   ensureAudio();
   const w = currentWorld;
   if (val === currentTask.answer){
+    if (w === 'drak'){
+      playCorrect();
+      bossHit();
+      return;
+    }
     inputLocked = true;
     playCorrect();
     flyGem();
@@ -844,9 +1016,10 @@ function answer(btn, val){
     }, 1300 + extraDelay);
   } else {
     playWrong();
+    if (w === 'drak') dragonBreath();
     btn.classList.add('wrong');
     missesThisTask++;
-    S.streak[w] = 0;
+    if (S.streak[w] !== undefined) S.streak[w] = 0;
     if (missesThisTask >= 2){
       document.querySelectorAll('.choice:not(.wrong)').forEach(b => b.classList.add('hintglow'));
       speak(currentTask.hint);

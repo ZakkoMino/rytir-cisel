@@ -1,6 +1,6 @@
 /* Rytíř Čísel — service worker: offline-first app shell + runtime font cache.
    Bump CACHE on every deploy so clients pick up the new version. */
-const CACHE = 'rytir-cisel-v3';
+const CACHE = 'rytir-cisel-v4';
 const ASSETS = [
   './',
   'index.html',
