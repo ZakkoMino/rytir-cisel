@@ -253,9 +253,59 @@
   .confetti-piece { position:fixed; top:-40px; font-size:26px; z-index:99; animation:fall linear forwards; pointer-events:none; }
   @keyframes fall { to { transform:translateY(110vh) rotate(720deg); } }
 
-  /* dragon wing flap */
+  /* ---------- character part animations ---------- */
   .wing { transform-origin:60px 40px; animation:flap 1.6s ease-in-out infinite; }
   @keyframes flap { 50% { transform:rotate(-14deg); } }
+  .d-tail { transform-box:fill-box; transform-origin:left center; animation:tailsway 3s ease-in-out infinite; }
+  @keyframes tailsway { 50% { transform:rotate(-9deg); } }
+  .d-lid { opacity:0; animation:blink 4.2s infinite; }
+  @keyframes blink { 0%,90%,100%{opacity:0;} 93%,97%{opacity:1;} }
+  .k-cape { transform-box:fill-box; transform-origin:top right; animation:flutter 2.4s ease-in-out infinite; }
+  @keyframes flutter { 50% { transform:rotate(7deg) scaleX(1.08); } }
+  .knight.hop .k-leg-l, .boss-knight.attack .k-leg-l { transform-box:fill-box; transform-origin:top center; animation:legL .7s ease; }
+  .knight.hop .k-leg-r, .boss-knight.attack .k-leg-r { transform-box:fill-box; transform-origin:top center; animation:legR .7s ease; }
+  @keyframes legL { 30% { transform:rotate(-28deg); } 70% { transform:rotate(18deg); } }
+  @keyframes legR { 30% { transform:rotate(24deg); } 70% { transform:rotate(-20deg); } }
+  .boss-knight.attack .k-arm { transform-box:fill-box; transform-origin:left bottom; animation:swing .55s ease; }
+  @keyframes swing { 40% { transform:rotate(-55deg); } 65% { transform:rotate(8deg); } }
+
+  /* obstacle idle animations (inner svg, so the flee transition on the wrapper still works) */
+  .a-troll svg { animation:stomp 1.8s ease-in-out infinite; }
+  @keyframes stomp { 25% { transform:translateY(-4px) rotate(-2deg); } 75% { transform:translateY(-4px) rotate(2deg); } }
+  .a-eagle svg { animation:eaglehover 1.3s ease-in-out infinite; }
+  @keyframes eaglehover { 50% { transform:translateY(-6px); } }
+  .a-croc svg { animation:crocrock 2.4s ease-in-out infinite; }
+  @keyframes crocrock { 50% { transform:rotate(3deg) translateX(2px); } }
+  .a-river svg { animation:riverbob 2s ease-in-out infinite; }
+  @keyframes riverbob { 50% { transform:translateY(2px) scaleX(1.03); } }
+  .a-spider svg { animation:spiderbob 2.2s ease-in-out infinite; }
+  @keyframes spiderbob { 50% { transform:translateY(5px); } }
+
+  /* task entrance + answer reveal */
+  @keyframes appear { from { transform:scale(0); opacity:0; } to { transform:scale(1); opacity:1; } }
+  .brick, .snake .seg, .snake .op, .snake .arrow, .snake-emoji, .eq .chip, .eq-equals { animation:appear .35s ease backwards; }
+  .brick.missing, .snake .seg.missing, .eq .chip.missing { animation:appear .35s ease backwards, pulse 1.2s .45s infinite; }
+  .choice { animation:appear .3s ease backwards; }
+  .solved {
+    background:linear-gradient(180deg,#b6f0a0,#6fce58) !important;
+    color:#1e5c12 !important; border:3px solid #3f9e3f !important;
+    animation:solvedPop .5s ease !important;
+  }
+  @keyframes solvedPop { 0%{transform:scale(1);} 40%{transform:scale(1.3);} 100%{transform:scale(1);} }
+
+  /* boss hit effects */
+  .spark { position:absolute; right:15%; bottom:58px; width:46px; z-index:7; pointer-events:none;
+    animation:sparkpop .55s ease forwards; }
+  .spark svg { width:100%; height:auto; display:block; }
+  @keyframes sparkpop { 0%{transform:scale(.2) rotate(0deg); opacity:1;} 70%{transform:scale(1.3) rotate(40deg); opacity:1;} 100%{transform:scale(1.7) rotate(70deg); opacity:0;} }
+  .hp-orb.just-lost { animation:orbout .5s ease; }
+  @keyframes orbout { 0%{transform:scale(1); filter:none; opacity:1;} 50%{transform:scale(1.6);} 100%{transform:scale(1); filter:grayscale(1); opacity:.3;} }
+
+  /* map nodes pop in */
+  .map-node { animation:appear .4s ease backwards; }
+  .map-node:nth-of-type(1) { animation-delay:.05s; }
+  .map-node:nth-of-type(2) { animation-delay:.16s; }
+  .map-node:nth-of-type(3) { animation-delay:.27s; }
 </style>
 </head>
 <body>
@@ -358,17 +408,17 @@
 
 /* ================= SVG art ================= */
 const KNIGHT_SVG = `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
-<path d="M24 30 Q8 44 15 60 Q26 54 28 42 Z" fill="#c0392b"/>
-<rect x="26" y="50" width="7" height="16" rx="3.5" fill="#44546b"/>
-<rect x="35" y="50" width="7" height="16" rx="3.5" fill="#44546b"/>
-<rect x="24" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/>
-<rect x="34" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/>
+<g class="k-cape"><path d="M24 30 Q8 44 15 60 Q26 54 28 42 Z" fill="#c0392b"/></g>
+<g class="k-leg-l"><rect x="26" y="50" width="7" height="16" rx="3.5" fill="#44546b"/><rect x="24" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/></g>
+<g class="k-leg-r"><rect x="35" y="50" width="7" height="16" rx="3.5" fill="#44546b"/><rect x="34" y="62" width="11" height="7" rx="3.5" fill="#6b4423"/></g>
 <rect x="22" y="28" width="24" height="26" rx="9" fill="#5b7fd4"/>
 <rect x="22" y="28" width="24" height="11" rx="5.5" fill="#7396e8"/>
+<g class="k-arm">
 <rect x="42" y="32" width="13" height="6" rx="3" fill="#7396e8"/>
 <rect x="51" y="8" width="5" height="28" rx="2.5" fill="#dbe4ee"/>
 <rect x="46" y="33" width="15" height="5" rx="2.5" fill="#d4a017"/>
 <circle cx="53.5" cy="42" r="3.5" fill="#d4a017"/>
+</g>
 <circle cx="21" cy="42" r="9.5" fill="#e2b007"/>
 <circle cx="21" cy="42" r="6" fill="#f6d14d"/>
 <circle cx="34" cy="18" r="10" fill="#f5c9a0"/>
@@ -379,7 +429,7 @@ const KNIGHT_SVG = `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
 </svg>`;
 
 const DRAGON_SVG = `<svg viewBox="0 0 100 84" xmlns="http://www.w3.org/2000/svg">
-<path d="M78 58 q16 2 18 -10 q-10 0 -14 4 Z" fill="#4e9b47"/>
+<g class="d-tail"><path d="M78 58 q16 2 18 -10 q-10 0 -14 4 Z" fill="#4e9b47"/></g>
 <g class="wing"><path d="M56 34 Q84 8 90 32 Q74 36 62 44 Z" fill="#3c7a36"/></g>
 <ellipse cx="52" cy="56" rx="26" ry="20" fill="#59b559"/>
 <ellipse cx="46" cy="62" rx="15" ry="11" fill="#bde6a8"/>
@@ -392,8 +442,12 @@ const DRAGON_SVG = `<svg viewBox="0 0 100 84" xmlns="http://www.w3.org/2000/svg"
 <path d="M28 14 l1 -10 5 8 Z" fill="#f2e2b0"/>
 <circle cx="24" cy="26" r="5" fill="#fff"/><circle cx="32" cy="27" r="4.4" fill="#fff"/>
 <circle cx="25" cy="27" r="2.4" fill="#222"/><circle cx="32.5" cy="28" r="2.1" fill="#222"/>
+<ellipse class="d-lid" cx="24" cy="26" rx="5.4" ry="5.4" fill="#59b559"/>
+<ellipse class="d-lid" cx="32" cy="27" rx="4.8" ry="4.8" fill="#59b559"/>
 <path d="M52 74 l-2 8 M62 74 l2 8" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/>
 </svg>`;
+
+const SPARK_SVG = `<svg viewBox="0 0 40 40"><path d="M20 0 L24 14 L40 20 L24 26 L20 40 L16 26 L0 20 L16 14 Z" fill="#ffd94d"/><circle cx="20" cy="20" r="5" fill="#fff"/></svg>`;
 
 const OBS_SVG = {
 troll:`<svg viewBox="0 0 64 64"><rect x="44" y="18" width="8" height="34" rx="4" fill="#8a5a2b" transform="rotate(18 48 35)"/><circle cx="48" cy="16" r="7" fill="#7a4a1f"/><ellipse cx="30" cy="42" rx="19" ry="17" fill="#6da84e"/><circle cx="16" cy="22" r="4" fill="#7cbf5a"/><circle cx="44" cy="22" r="4" fill="#7cbf5a"/><circle cx="30" cy="22" r="13" fill="#7cbf5a"/><circle cx="25" cy="20" r="4" fill="#fff"/><circle cx="35" cy="20" r="4" fill="#fff"/><circle cx="26" cy="21" r="2" fill="#222"/><circle cx="34" cy="21" r="2" fill="#222"/><path d="M20 13 l8 4 M40 13 l-8 4" stroke="#3f6f2a" stroke-width="2.5" stroke-linecap="round"/><path d="M23 29 q7 5 14 0 Z" fill="#4a3020"/><rect x="25" y="28" width="4" height="4" rx="1" fill="#fff"/><rect x="31" y="28" width="4" height="4" rx="1" fill="#fff"/></svg>`,
@@ -401,7 +455,7 @@ boulder:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="57" rx="22" ry="4" fill="
 eagle:`<svg viewBox="0 0 64 64"><path d="M6 20 Q20 6 32 22 Q44 6 58 20 Q44 22 36 28 Q30 32 28 28 Q20 22 6 20 Z" fill="#8a5a2b"/><ellipse cx="32" cy="36" rx="10" ry="13" fill="#a06a35"/><circle cx="32" cy="22" r="8" fill="#f4f0e6"/><circle cx="34.5" cy="21" r="1.8" fill="#222"/><path d="M39 23 l7 2.5 -7 2.5 Z" fill="#e8a423"/><path d="M26 48 l3 6 M32 49 l0 7 M38 48 l-3 6" stroke="#e8a423" stroke-width="2.5" stroke-linecap="round"/></svg>`,
 croc:`<svg viewBox="0 0 64 64"><ellipse cx="40" cy="44" rx="20" ry="12" fill="#4e9b47"/><path d="M56 40 q8 -6 6 -14 q-6 4 -10 8 Z" fill="#4e9b47"/><ellipse cx="18" cy="40" rx="16" ry="8" fill="#5fae55"/><path d="M8 44 l3 -4 3 4 3 -4 3 4 3 -4 3 4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="#5fae55"/><circle cx="30" cy="29" r="2" fill="#222"/><path d="M30 38 l4 -5 4 5 4 -5 4 5" fill="#3c7a36"/><path d="M34 52 l2 6 M44 52 l0 7 M52 48 l3 6" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/></svg>`,
 river:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="46" rx="28" ry="14" fill="#4aa8e8"/><path d="M8 44 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0" stroke="#bfe4ff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 52 q5 -4 10 0 q5 4 10 0 q5 -4 10 0" stroke="#8fd0ff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M26 28 q6 -12 12 0 q-6 -4 -12 0 Z" fill="#4aa8e8" opacity=".8"/></svg>`,
-spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v18" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`
+spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v24" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`
 };
 
 const GOAL_SVG = {
@@ -683,7 +737,7 @@ function renderScene(){
   html += '<div class="goal" style="left:' + slotLeft(10) + '; bottom:' + (SLOT_B[10]+10) + 'px">' + GOAL_SVG[w] + '</div>';
   for (const [slot, cfg] of Object.entries(WORLDS[w].obstacles)){
     if (Number(slot) > pos){
-      html += '<div class="obstacle" id="ob-' + slot + '" style="left:' + slotLeft(Number(slot)) + '; bottom:' + (SLOT_B[slot]+8) + 'px">' + OBS_SVG[cfg.svg] + '</div>';
+      html += '<div class="obstacle a-' + cfg.svg + '" id="ob-' + slot + '" style="left:' + slotLeft(Number(slot)) + '; bottom:' + (SLOT_B[slot]+8) + 'px">' + OBS_SVG[cfg.svg] + '</div>';
     }
   }
   html += '<div class="knight" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + KNIGHT_SVG + '</div>';
@@ -776,11 +830,15 @@ function renderBossScene(){
   scene.innerHTML = html;
   renderHpOrbs();
 }
-function renderHpOrbs(){
+function renderHpOrbs(animateNewLoss){
   const row = document.getElementById('hp-row');
   if (!row) return;
   let html = '';
-  for (let i=0; i<BOSS_MAX; i++) html += '<span class="hp-orb' + (i < bossHP ? '' : ' lost') + '">🔥</span>';
+  for (let i=0; i<BOSS_MAX; i++){
+    const lost = i >= bossHP;
+    const just = animateNewLoss && i === bossHP;
+    html += '<span class="hp-orb' + (lost ? ' lost' : '') + (just ? ' just-lost' : '') + '">🔥</span>';
+  }
   row.innerHTML = html;
 }
 function dragonBreath(){
@@ -796,8 +854,18 @@ function bossHit(){
   playHit();
   const k = document.getElementById('boss-knight'), d = document.getElementById('boss-dragon');
   if (k && k.classList){ k.classList.remove('attack'); void k.offsetWidth; k.classList.add('attack'); }
-  setTimeout(() => { if (d && d.classList) d.classList.add('hit'); }, 250);
-  renderHpOrbs();
+  setTimeout(() => {
+    if (d && d.classList) d.classList.add('hit');
+    const scene = document.getElementById('scene');
+    if (scene && scene.appendChild){
+      const sp = document.createElement('div');
+      sp.className = 'spark';
+      sp.innerHTML = SPARK_SVG;
+      scene.appendChild(sp);
+      setTimeout(() => { if (sp.remove) sp.remove(); }, 650);
+    }
+    renderHpOrbs(true);
+  }, 250);
   renderBossHud();
   if (bossHP <= 0){
     setTimeout(() => {
@@ -899,15 +967,17 @@ function renderTask(){
   const area = document.getElementById('task-area');
   area.innerHTML = '';
   const t = currentTask;
+  let delay = 0;
+  const stagger = (node) => { node.style.animationDelay = delay + 'ms'; delay += 55; return node; };
   if (t.kind === 'drak'){
     const eq = document.createElement('div');
     eq.className = 'eq';
     t.eq.forEach((v,i) => {
       const ch = document.createElement('div');
       if (v === '='){ ch.className = 'eq-equals'; ch.textContent = '='; }
-      else if (i === t.missIdx){ ch.className = 'chip missing'; ch.textContent = '?'; }
+      else if (i === t.missIdx){ ch.className = 'chip missing'; ch.id = 'miss-slot'; ch.textContent = '?'; }
       else { ch.className = 'chip'; ch.textContent = v; }
-      eq.appendChild(ch);
+      eq.appendChild(stagger(ch));
     });
     area.appendChild(eq);
     return;
@@ -920,8 +990,9 @@ function renderTask(){
         const b = document.createElement('div');
         const isMissing = (r === t.mr && i === t.mi);
         b.className = 'brick' + (isMissing ? ' missing' : '');
+        if (isMissing) b.id = 'miss-slot';
         b.textContent = isMissing ? '?' : v;
-        row.appendChild(b);
+        row.appendChild(stagger(b));
       });
       area.appendChild(row);
     }
@@ -931,13 +1002,14 @@ function renderTask(){
     const head = document.createElement('span');
     head.className = 'snake-emoji';
     head.textContent = '🐍';
-    snake.appendChild(head);
+    snake.appendChild(stagger(head));
     t.vals.forEach((v,i) => {
       const seg = document.createElement('div');
       const isMissing = i === t.bi;
       seg.className = 'seg' + (i === 0 ? ' head' : '') + (isMissing ? ' missing' : '');
+      if (isMissing) seg.id = 'miss-slot';
       seg.textContent = isMissing ? '?' : v;
-      snake.appendChild(seg);
+      snake.appendChild(stagger(seg));
       if (i < t.ops.length){
         const arrow = document.createElement('span');
         arrow.className = 'arrow';
@@ -945,8 +1017,8 @@ function renderTask(){
         const op = document.createElement('span');
         op.className = 'op';
         op.textContent = (t.ops[i] >= 0 ? '+' : '−') + Math.abs(t.ops[i]);
-        snake.appendChild(arrow);
-        snake.appendChild(op);
+        snake.appendChild(stagger(arrow));
+        snake.appendChild(stagger(op));
       }
     });
     area.appendChild(snake);
@@ -956,9 +1028,10 @@ function renderChoices(){
   const box = document.getElementById('choices');
   box.innerHTML = '';
   const opts = currentTask.choices ? shuffle([...currentTask.choices]) : makeChoices(currentTask.answer);
-  opts.forEach(v => {
+  opts.forEach((v,i) => {
     const b = document.createElement('button');
     b.className = 'choice';
+    b.style.animationDelay = (200 + i*80) + 'ms';
     b.textContent = v;
     b.onclick = () => answer(b, v);
     box.appendChild(b);
@@ -972,6 +1045,7 @@ function answer(btn, val){
   ensureAudio();
   const w = currentWorld;
   if (val === currentTask.answer){
+    revealAnswer(val);
     if (w === 'drak'){
       playCorrect();
       bossHit();
@@ -1028,6 +1102,12 @@ function answer(btn, val){
       toast('Zkus to znovu!');
     }
   }
+}
+function revealAnswer(val){
+  const ms = document.getElementById('miss-slot');
+  if (!ms) return;
+  ms.textContent = String(val);
+  if (ms.classList) ms.classList.add('solved');
 }
 function toast(msg){
   const t = document.getElementById('toast');
