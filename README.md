@@ -30,3 +30,15 @@ krokodýl…). Za 10 drahokamů je medaile, se dvěma medailemi se otevře Drač
 ## Spuštění
 
 Otevřete `index.html` v libovolném prohlížeči, nebo hru spusťte online na adrese výše.
+
+## Instalace jako aplikace (PWA)
+
+Hra je progresivní webová aplikace — dá se nainstalovat jako opravdová aplikace
+s ikonou a funguje pak i úplně bez internetu:
+
+- **Android (Chrome/Edge):** otevřete hru → menu ⋮ → **Přidat na plochu / Instalovat aplikaci**
+- **iPad/iPhone (Safari):** otevřete hru → tlačítko Sdílet → **Přidat na plochu**
+- **Windows (Chrome/Edge):** ikona instalace v adresním řádku → **Instalovat**
+
+Po první návštěvě online se celá hra uloží do zařízení (service worker) a spouští se
+okamžitě i offline.
