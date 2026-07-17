@@ -121,10 +121,39 @@
   .knight.hop { animation:hop .7s ease; }
   @keyframes hop { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(-26px);} }
   .obstacle { position:absolute; width:48px; height:48px; z-index:4;
-    transform:translateX(-50%); transition:transform .7s ease, opacity .7s ease;
+    transform:translateX(-50%);
     filter:drop-shadow(0 3px 3px rgba(0,0,0,.25)); }
   .obstacle svg { width:100%; height:100%; display:block; }
-  .obstacle.flee { transform:translateX(-50%) translateY(-90px) rotate(300deg); opacity:0; }
+  /* creature knocked flying by a sword strike */
+  .obstacle.knocked { animation:knockout .9s ease-in forwards; z-index:6; }
+  @keyframes knockout {
+    15% { transform:translateX(-50%) translateY(-12px) rotate(-18deg); }
+    100% { transform:translateX(-50%) translate(340px,-70px) rotate(660deg); opacity:0; }
+  }
+  /* inanimate obstacle shattered by a number-spell */
+  .obstacle.blasted { animation:blastout .8s ease forwards; z-index:6; }
+  @keyframes blastout {
+    25% { transform:translateX(-50%) scale(1.25); filter:brightness(1.9); }
+    100% { transform:translateX(-50%) scale(0) rotate(200deg); opacity:0; filter:brightness(3); }
+  }
+  /* sword slash arc */
+  .slash { position:absolute; width:58px; z-index:8; transform:translateX(-50%); pointer-events:none;
+    animation:slashpop .5s ease forwards; }
+  .slash svg { width:100%; height:auto; display:block; }
+  @keyframes slashpop {
+    0% { transform:translateX(-50%) rotate(-70deg) scale(.3); opacity:0; }
+    25% { opacity:1; }
+    100% { transform:translateX(-50%) rotate(45deg) scale(1.3); opacity:0; }
+  }
+  /* knight lunge + sword swing on the journey path */
+  .knight.strike { animation:strikelunge .55s ease; }
+  @keyframes strikelunge { 35% { transform:translateX(-50%) translateX(16px); } 60% { transform:translateX(-50%) translateX(10px); } }
+  .knight.strike .k-arm, .knight.strike .b-arm { transform-box:fill-box; transform-origin:left bottom; animation:swing .55s ease; }
+  .magic-ring { position:absolute; width:60px; height:60px; z-index:7; pointer-events:none;
+    transform:translateX(-50%); border:4px solid #ffd94d; border-radius:50%;
+    box-shadow:0 0 14px 4px rgba(255,217,77,.8), inset 0 0 10px 2px rgba(255,217,77,.6);
+    animation:ringpop .55s ease forwards; }
+  @keyframes ringpop { 0% { transform:translateX(-50%) scale(.15); opacity:1; } 100% { transform:translateX(-50%) scale(1.5); opacity:0; } }
   .goal { position:absolute; width:42px; z-index:3; animation:gpulse 1.6s infinite; }
   .goal svg { width:100%; height:auto; display:block; }
   @keyframes gpulse { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.08);} }
@@ -136,14 +165,23 @@
   .boss-knight { position:absolute; left:11%; bottom:14px; width:60px; height:66px; z-index:5;
     filter:drop-shadow(0 3px 3px rgba(0,0,0,.4)); animation:kbob 2.4s ease-in-out infinite; }
   .boss-knight svg { width:100%; height:100%; display:block; }
-  .boss-knight.attack { animation:lunge .55s ease; }
-  @keyframes lunge { 45% { transform:translateX(52px); } }
+  .boss-knight.attack { animation:bosscharge .9s ease; }
+  @keyframes bosscharge {
+    30%, 55% { transform:translateX(min(300px,52vw)); }
+    42% { transform:translateX(min(300px,52vw)) translateY(-10px); }
+  }
+  .boss-knight.attack .k-leg-l { transform-box:fill-box; transform-origin:top center; animation:legL .9s ease; }
+  .boss-knight.attack .k-leg-r { transform-box:fill-box; transform-origin:top center; animation:legR .9s ease; }
+  .boss-knight.block { animation:shieldblock .9s ease; }
+  @keyframes shieldblock { 25%, 70% { transform:translateX(-10px) rotate(-9deg); } }
+  .boss-knight.block .k-shield { transform-box:fill-box; transform-origin:center; animation:shieldglow .9s ease; }
+  @keyframes shieldglow { 30%, 65% { transform:scale(1.4); filter:drop-shadow(0 0 8px #ffd94d) brightness(1.6); } }
   .boss-dragon { position:absolute; right:5%; bottom:8px; width:118px; z-index:5;
     filter:drop-shadow(0 3px 4px rgba(0,0,0,.4)); animation:hover 3s ease-in-out infinite; }
   .boss-dragon svg { width:100%; height:auto; display:block; }
-  .boss-dragon.hit { animation:dshake .55s ease; }
-  @keyframes dshake { 20%{transform:translateX(9px) rotate(3deg);} 40%{transform:translateX(-9px);}
-    60%{transform:translateX(6px) rotate(-2deg);} 80%{transform:translateX(-4px);} }
+  .boss-dragon.hit { animation:dshake .7s ease; }
+  @keyframes dshake { 18%{transform:translateX(30px) rotate(9deg) translateY(-8px);} 40%{transform:translateX(14px) rotate(-4deg);}
+    62%{transform:translateX(20px) rotate(3deg);} 82%{transform:translateX(6px);} }
   .breath { position:absolute; right:23%; bottom:58px; width:54px; z-index:4; opacity:0; transition:opacity .25s; }
   .breath.on { opacity:1; }
   .breath svg { width:100%; height:auto; display:block; }
@@ -262,14 +300,14 @@
   @keyframes blink { 0%,90%,100%{opacity:0;} 93%,97%{opacity:1;} }
   .k-cape { transform-box:fill-box; transform-origin:top right; animation:flutter 2.4s ease-in-out infinite; }
   @keyframes flutter { 50% { transform:rotate(7deg) scaleX(1.08); } }
-  .knight.hop .k-leg-l, .boss-knight.attack .k-leg-l { transform-box:fill-box; transform-origin:top center; animation:legL .7s ease; }
-  .knight.hop .k-leg-r, .boss-knight.attack .k-leg-r { transform-box:fill-box; transform-origin:top center; animation:legR .7s ease; }
+  .knight.hop .k-leg-l { transform-box:fill-box; transform-origin:top center; animation:legL .7s ease; }
+  .knight.hop .k-leg-r { transform-box:fill-box; transform-origin:top center; animation:legR .7s ease; }
   @keyframes legL { 30% { transform:rotate(-28deg); } 70% { transform:rotate(18deg); } }
   @keyframes legR { 30% { transform:rotate(24deg); } 70% { transform:rotate(-20deg); } }
-  .boss-knight.attack .k-arm { transform-box:fill-box; transform-origin:left bottom; animation:swing .55s ease; }
-  @keyframes swing { 40% { transform:rotate(-55deg); } 65% { transform:rotate(8deg); } }
+  .boss-knight.attack .k-arm { transform-box:fill-box; transform-origin:left bottom; animation:swing .9s ease; }
+  @keyframes swing { 40% { transform:rotate(-60deg); } 60% { transform:rotate(10deg); } }
 
-  /* obstacle idle animations (inner svg, so the flee transition on the wrapper still works) */
+  /* obstacle idle animations (inner svg, so knockout/blastout on the wrapper still works) */
   .a-troll svg { animation:stomp 1.8s ease-in-out infinite; }
   @keyframes stomp { 25% { transform:translateY(-4px) rotate(-2deg); } 75% { transform:translateY(-4px) rotate(2deg); } }
   .a-eagle svg { animation:eaglehover 1.3s ease-in-out infinite; }
@@ -281,23 +319,31 @@
   .a-spider svg { animation:spiderbob 2.2s ease-in-out infinite; }
   @keyframes spiderbob { 50% { transform:translateY(5px); } }
 
-  /* ---------- bus world ---------- */
+  /* ---------- gnome lake (boat) world ---------- */
   .bus-row { display:flex; align-items:center; flex-wrap:wrap; justify-content:center; gap:6px; row-gap:14px; }
-  .bus-row .arrow { font-size:clamp(18px,4.5vw,26px); font-weight:bold; color:#b8741a; }
+  .bus-row .arrow { font-size:clamp(18px,4.5vw,26px); font-weight:bold; color:#2f7fb5; }
   .bus-chip {
     min-width:min(74px,17vw); height:min(64px,15vw); padding:0 12px; border-radius:16px;
     display:flex; align-items:center; justify-content:center; white-space:nowrap;
-    font-size:clamp(18px,4.6vw,26px); font-weight:bold; color:#6b4200;
-    background:linear-gradient(180deg,#ffe08a,#ffc93c); border:3px solid #d69515;
+    font-size:clamp(18px,4.6vw,26px); font-weight:bold; color:#083b63;
+    background:linear-gradient(180deg,#bfe4ff,#7cc0ee); border:3px solid #3a86bd;
     box-shadow:inset 0 -5px 0 rgba(0,0,0,.08);
   }
   .bus-chip.missing { background:#fff; color:#e2544a; border:3px dashed #e2544a; }
-  .knight.as-bus { width:78px; height:48px; }
-  .bus-wheel { transform-box:fill-box; transform-origin:center; animation:wheelspin 1.1s linear infinite; }
-  @keyframes wheelspin { to { transform:rotate(360deg); } }
-  .a-cow svg { animation:crocrock 2.6s ease-in-out infinite; }
-  .tl-red { animation:blinkred 1.4s infinite; }
-  @keyframes blinkred { 50% { opacity:.3; } }
+  .knight.as-boat { width:86px; height:62px; animation:boatrock 2.8s ease-in-out infinite; }
+  @keyframes boatrock { 0%,100% { transform:translateX(-50%) rotate(-2deg); } 50% { transform:translateX(-50%) rotate(2.5deg) translateY(-3px); } }
+  .knight.as-boat.hop { animation:boathop .7s ease; }
+  @keyframes boathop { 50% { transform:translateX(-50%) translateY(-14px) rotate(4deg); } }
+  .knight.as-boat.strike { animation:boatsurge .55s ease; }
+  @keyframes boatsurge { 35% { transform:translateX(-50%) translateX(18px) rotate(3deg); } 60% { transform:translateX(-50%) translateX(12px); } }
+  .sail { transform-box:fill-box; transform-origin:left center; animation:sailflutter 2.4s ease-in-out infinite; }
+  @keyframes sailflutter { 50% { transform:scaleX(.94) skewY(-2deg); } }
+  .a-octo svg { animation:spiderbob 2.4s ease-in-out infinite; }
+  .a-whirl svg { animation:whirlspin 2.6s linear infinite; }
+  @keyframes whirlspin { to { transform:rotate(360deg); } }
+  .a-wdragon svg { animation:eaglehover 1.8s ease-in-out infinite; }
+  .scene.bus .stone { background:rgba(235,248,255,.55); }
+  .scene.bus .stone.reached { background:#ffd94d; }
 
   #ov-text { white-space:pre-line; }
 
@@ -313,11 +359,11 @@
   }
   @keyframes solvedPop { 0%{transform:scale(1);} 40%{transform:scale(1.3);} 100%{transform:scale(1);} }
 
-  /* boss hit effects */
-  .spark { position:absolute; right:15%; bottom:58px; width:46px; z-index:7; pointer-events:none;
-    animation:sparkpop .55s ease forwards; }
+  /* hit effects (journey fights + boss battle) */
+  .spark { position:absolute; width:46px; z-index:7; pointer-events:none;
+    transform:translateX(-50%); animation:sparkpop .55s ease forwards; }
   .spark svg { width:100%; height:auto; display:block; }
-  @keyframes sparkpop { 0%{transform:scale(.2) rotate(0deg); opacity:1;} 70%{transform:scale(1.3) rotate(40deg); opacity:1;} 100%{transform:scale(1.7) rotate(70deg); opacity:0;} }
+  @keyframes sparkpop { 0%{transform:translateX(-50%) scale(.2) rotate(0deg); opacity:1;} 70%{transform:translateX(-50%) scale(1.3) rotate(40deg); opacity:1;} 100%{transform:translateX(-50%) scale(1.7) rotate(70deg); opacity:0;} }
   .hp-orb.just-lost { animation:orbout .5s ease; }
   @keyframes orbout { 0%{transform:scale(1); filter:none; opacity:1;} 50%{transform:scale(1.6);} 100%{transform:scale(1); filter:grayscale(1); opacity:.3;} }
 
@@ -445,8 +491,8 @@
       <div class="lvl" id="map-lvl-had"></div>
     </div>
     <div class="map-node" style="left:33%; top:60%;" onclick="openWorld('bus')">
-      <div class="node-icon"><svg viewBox="0 0 96 56"><rect x="2" y="6" width="90" height="36" rx="10" fill="#ffc93c"/><rect x="2" y="28" width="90" height="10" fill="#f0a500"/><rect x="10" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="28" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="46" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/><rect x="66" y="12" width="20" height="26" rx="4" fill="#8fd0ff"/><circle cx="24" cy="44" r="9" fill="#333"/><circle cx="24" cy="44" r="4.5" fill="#999"/><circle cx="70" cy="44" r="9" fill="#333"/><circle cx="70" cy="44" r="4.5" fill="#999"/></svg></div>
-      <h3>Kouzelný autobus</h3>
+      <div class="node-icon"><svg viewBox="0 0 96 56"><ellipse cx="48" cy="50" rx="44" ry="6" fill="#4aa8e8"/><path d="M46 6 v28" stroke="#8a5a2b" stroke-width="3"/><path d="M48 8 Q72 14 68 32 L48 32 Z" fill="#fffef5" stroke="#d5dce6" stroke-width="1.5"/><path d="M44 12 Q28 18 30 32 L44 32 Z" fill="#e8f2fc" stroke="#d5dce6" stroke-width="1.5"/><path d="M46 6 h12 l-4 3 4 3 h-12 Z" fill="#e2544a"/><path d="M22 36 h52 l-8 12 h-36 Z" fill="#b8741a"/><path d="M22 36 h52 v3 h-52 Z" fill="#8a5a2b"/></svg></div>
+      <h3>Skřítčí jezero</h3>
       <div class="medals" id="medals-bus"></div>
       <div class="lvl" id="map-lvl-bus"></div>
     </div>
@@ -506,8 +552,8 @@ const KNIGHT_SVG = `<svg viewBox="0 0 64 72" xmlns="http://www.w3.org/2000/svg">
 <rect x="46" y="33" width="15" height="5" rx="2.5" fill="#d4a017"/>
 <circle cx="53.5" cy="42" r="3.5" fill="#d4a017"/>
 </g>
-<circle cx="21" cy="42" r="9.5" fill="#e2b007"/>
-<circle cx="21" cy="42" r="6" fill="#f6d14d"/>
+<g class="k-shield"><circle cx="21" cy="42" r="9.5" fill="#e2b007"/>
+<circle cx="21" cy="42" r="6" fill="#f6d14d"/></g>
 <circle cx="34" cy="18" r="10" fill="#f5c9a0"/>
 <path d="M24 18 a10 10 0 0 1 20 0 l0 3 h-4 v-3 h-12 v3 h-4 Z" fill="#9fb2c8"/>
 <path d="M34 5 Q28 0 24 4 Q29 6 31 10 Z" fill="#c0392b"/>
@@ -536,17 +582,31 @@ const DRAGON_SVG = `<svg viewBox="0 0 100 84" xmlns="http://www.w3.org/2000/svg"
 
 const SPARK_SVG = `<svg viewBox="0 0 40 40"><path d="M20 0 L24 14 L40 20 L24 26 L20 40 L16 26 L0 20 L16 14 Z" fill="#ffd94d"/><circle cx="20" cy="20" r="5" fill="#fff"/></svg>`;
 
-const BUS_SVG = `<svg viewBox="0 0 96 56" xmlns="http://www.w3.org/2000/svg">
-<rect x="2" y="6" width="90" height="36" rx="10" fill="#ffc93c"/>
-<rect x="2" y="28" width="90" height="10" fill="#f0a500"/>
-<rect x="10" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
-<rect x="28" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
-<rect x="46" y="12" width="14" height="13" rx="3" fill="#bfe4ff"/>
-<rect x="66" y="12" width="20" height="26" rx="4" fill="#8fd0ff"/>
-<rect x="66" y="12" width="20" height="26" rx="4" fill="none" stroke="#d69515" stroke-width="2"/>
-<circle cx="90" cy="34" r="3.5" fill="#fff3b0"/>
-<g class="bus-wheel"><circle cx="24" cy="44" r="9" fill="#333"/><circle cx="24" cy="44" r="4.5" fill="#999"/><path d="M24 36 v16 M16 44 h16" stroke="#666" stroke-width="2"/></g>
-<g class="bus-wheel"><circle cx="70" cy="44" r="9" fill="#333"/><circle cx="70" cy="44" r="4.5" fill="#999"/><path d="M70 36 v16 M62 44 h16" stroke="#666" stroke-width="2"/></g>
+const SLASH_SVG = `<svg viewBox="0 0 60 60"><path d="M6 50 A38 38 0 0 0 50 6" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M10 46 A32 32 0 0 0 46 10" stroke="#ffd94d" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`;
+
+const BOAT_SVG = `<svg viewBox="0 0 96 68" xmlns="http://www.w3.org/2000/svg">
+<path d="M40 4 v36" stroke="#8a5a2b" stroke-width="3.5"/>
+<g class="sail"><path d="M43 6 Q70 14 66 36 L43 36 Z" fill="#fffef5" stroke="#d5dce6" stroke-width="1.5"/>
+<circle cx="54" cy="23" r="6" fill="#5bc0eb"/><path d="M54 17 L59 23 L54 29 L49 23 Z" fill="#8fd0ff"/></g>
+<path d="M40 4 h13 l-4.5 3.5 4.5 3.5 h-13 Z" fill="#e2544a"/>
+<g transform="translate(8,18) scale(0.52)">
+<circle cx="34" cy="18" r="10" fill="#f5c9a0"/>
+<path d="M24 18 a10 10 0 0 1 20 0 l0 3 h-4 v-3 h-12 v3 h-4 Z" fill="#9fb2c8"/>
+<path d="M34 5 Q28 0 24 4 Q29 6 31 10 Z" fill="#c0392b"/>
+<circle cx="38" cy="20" r="1.7" fill="#2b3a55"/>
+<path d="M35 24 q3 2.5 6 0" stroke="#c98a6b" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+<rect x="22" y="28" width="24" height="22" rx="9" fill="#5b7fd4"/>
+<rect x="22" y="28" width="24" height="10" rx="5" fill="#7396e8"/>
+<g class="b-arm">
+<rect x="42" y="32" width="13" height="6" rx="3" fill="#7396e8"/>
+<rect x="51" y="8" width="5" height="28" rx="2.5" fill="#dbe4ee"/>
+<rect x="46" y="33" width="15" height="5" rx="2.5" fill="#d4a017"/>
+<circle cx="53.5" cy="42" r="3.5" fill="#d4a017"/>
+</g>
+</g>
+<path d="M6 44 Q10 40 16 42 L82 42 Q90 40 92 44 L86 58 Q48 64 12 58 Z" fill="#b8741a"/>
+<path d="M6 44 Q48 50 92 44 L91 47 Q48 53 7 47 Z" fill="#8a5a2b"/>
+<path d="M2 60 q7 -5 14 0 q7 5 14 0 q7 -5 14 0 q7 5 14 0 q7 -5 14 0 q7 5 14 0" stroke="#bfe4ff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"/>
 </svg>`;
 
 const OBS_SVG = {
@@ -556,15 +616,15 @@ eagle:`<svg viewBox="0 0 64 64"><path d="M6 20 Q20 6 32 22 Q44 6 58 20 Q44 22 36
 croc:`<svg viewBox="0 0 64 64"><ellipse cx="40" cy="44" rx="20" ry="12" fill="#4e9b47"/><path d="M56 40 q8 -6 6 -14 q-6 4 -10 8 Z" fill="#4e9b47"/><ellipse cx="18" cy="40" rx="16" ry="8" fill="#5fae55"/><path d="M8 44 l3 -4 3 4 3 -4 3 4 3 -4 3 4" fill="none" stroke="#fff" stroke-width="2"/><circle cx="30" cy="30" r="5" fill="#5fae55"/><circle cx="30" cy="29" r="2" fill="#222"/><path d="M30 38 l4 -5 4 5 4 -5 4 5" fill="#3c7a36"/><path d="M34 52 l2 6 M44 52 l0 7 M52 48 l3 6" stroke="#3c7a36" stroke-width="3" stroke-linecap="round"/></svg>`,
 river:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="46" rx="28" ry="14" fill="#4aa8e8"/><path d="M8 44 q6 -5 12 0 q6 5 12 0 q6 -5 12 0 q6 5 12 0" stroke="#bfe4ff" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M14 52 q5 -4 10 0 q5 4 10 0 q5 -4 10 0" stroke="#8fd0ff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M26 28 q6 -12 12 0 q-6 -4 -12 0 Z" fill="#4aa8e8" opacity=".8"/></svg>`,
 spider:`<svg viewBox="0 0 64 64"><path d="M32 0 v24" stroke="#888" stroke-width="1.5"/><circle cx="32" cy="26" r="8" fill="#3a3a4a"/><ellipse cx="32" cy="42" rx="11" ry="12" fill="#4a4a5e"/><path d="M22 36 q-10 -2 -14 -8 M22 42 q-11 1 -16 -2 M22 48 q-9 4 -13 10 M42 36 q10 -2 14 -8 M42 42 q11 1 16 -2 M42 48 q9 4 13 10" stroke="#3a3a4a" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="29" cy="24" r="2.5" fill="#fff"/><circle cx="35" cy="24" r="2.5" fill="#fff"/><circle cx="29.5" cy="25" r="1.2" fill="#e2544a"/><circle cx="34.5" cy="25" r="1.2" fill="#e2544a"/></svg>`,
-cow:`<svg viewBox="0 0 64 64"><ellipse cx="36" cy="40" rx="20" ry="13" fill="#f4f0e6"/><ellipse cx="30" cy="35" rx="6" ry="4.5" fill="#4a3a2a"/><ellipse cx="46" cy="44" rx="5.5" ry="4" fill="#4a3a2a"/><path d="M28 51 v7 M36 52 v7 M44 51 v7 M52 48 v7" stroke="#d8cdb8" stroke-width="4" stroke-linecap="round"/><circle cx="15" cy="29" r="9.5" fill="#f4f0e6"/><path d="M7 22 q-5 -5 1 -8 M23 22 q5 -5 -1 -8" stroke="#d8cdb8" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="13" cy="34" rx="5.5" ry="4" fill="#f2b8c6"/><circle cx="11" cy="26" r="1.6" fill="#222"/><circle cx="18" cy="26" r="1.6" fill="#222"/></svg>`,
-cone:`<svg viewBox="0 0 64 64"><path d="M32 10 L45 52 H19 Z" fill="#ff8c42"/><path d="M27 30 h10 M23 42 h18" stroke="#fff" stroke-width="5" stroke-linecap="round"/><rect x="10" y="52" width="44" height="7" rx="3.5" fill="#e8632a"/><circle cx="32" cy="10" r="3.5" fill="#e8632a"/></svg>`,
-light:`<svg viewBox="0 0 64 64"><rect x="29" y="28" width="6" height="32" rx="3" fill="#556070"/><rect x="19" y="2" width="26" height="32" rx="8" fill="#333a4a"/><circle class="tl-red" cx="32" cy="12" r="5.5" fill="#ff5a4e"/><circle cx="32" cy="25" r="5.5" fill="#2a5a2a"/></svg>`
+octo:`<svg viewBox="0 0 64 64"><ellipse cx="32" cy="26" rx="17" ry="16" fill="#b06ac9"/><ellipse cx="32" cy="30" rx="13" ry="10" fill="#cf9ae0"/><circle cx="26" cy="22" r="5" fill="#fff"/><circle cx="38" cy="22" r="5" fill="#fff"/><circle cx="27" cy="23" r="2.4" fill="#222"/><circle cx="37" cy="23" r="2.4" fill="#222"/><path d="M27 33 q5 4 10 0" stroke="#7a3b96" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M18 38 q-8 6 -4 14 M26 41 q-4 8 2 15 M38 41 q4 8 -2 15 M46 38 q8 6 4 14" stroke="#b06ac9" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M10 56 q6 -4 12 0 q6 4 12 0 q6 -4 12 0 q6 4 8 -1" stroke="#4aa8e8" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".85"/></svg>`,
+whirl:`<svg viewBox="0 0 64 64"><path d="M32 8 A24 24 0 1 1 8 32" stroke="#4aa8e8" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M32 18 A14 14 0 1 1 18 32" stroke="#8fd0ff" stroke-width="5.5" fill="none" stroke-linecap="round"/><path d="M32 26 A6 6 0 1 1 26 32" stroke="#bfe4ff" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="32" cy="32" r="3" fill="#e8f7ff"/></svg>`,
+wdragon:`<svg viewBox="0 0 64 64"><path d="M14 58 Q8 40 20 32 Q34 24 30 12" stroke="#4e9b47" stroke-width="11" fill="none" stroke-linecap="round"/><path d="M22 46 l-7 -3 5 -6 Z M26 34 l-8 -1 4 -7 Z" fill="#3c7a36"/><circle cx="32" cy="11" r="10" fill="#59b559"/><ellipse cx="42" cy="14" rx="7" ry="5" fill="#6fc46f"/><circle cx="45" cy="13" r="1.4" fill="#2b3a55"/><path d="M27 3 l-2 -6 5 3 Z M34 2 l1 -7 4 6 Z" fill="#f2e2b0"/><circle cx="31" cy="8" r="3.6" fill="#fff"/><circle cx="32" cy="9" r="1.8" fill="#222"/><path d="M4 58 q6 -4 12 0 q6 4 12 0 q6 -4 12 0 q6 4 12 0 q6 -4 8 -1" stroke="#4aa8e8" stroke-width="3.5" fill="none" stroke-linecap="round" opacity=".85"/></svg>`
 };
 
 const GOAL_SVG = {
 pyr:`<svg viewBox="0 0 48 64"><rect x="21" y="8" width="4" height="52" rx="2" fill="#8a5a2b"/><path d="M25 8 h20 l-6 8 6 8 h-20 Z" fill="#e2544a"/><circle cx="23" cy="6" r="4" fill="#ffd94d"/></svg>`,
 had:`<svg viewBox="0 0 64 56"><circle cx="20" cy="16" r="3" fill="#7ee0e8"/><circle cx="44" cy="14" r="3" fill="#f78fb3"/><circle cx="32" cy="10" r="3" fill="#9ff0a0"/><rect x="8" y="22" width="48" height="28" rx="6" fill="#8a5a2b"/><path d="M8 30 a24 14 0 0 1 48 0 v2 h-48 Z" fill="#a06a35"/><rect x="8" y="30" width="48" height="5" fill="#6b4423"/><rect x="27" y="27" width="10" height="12" rx="2" fill="#ffd94d"/><circle cx="32" cy="34" r="2" fill="#8a5a2b"/></svg>`,
-bus:`<svg viewBox="0 0 48 64"><rect x="21" y="6" width="4" height="54" rx="2" fill="#8a5a2b"/><rect x="25" y="6" width="20" height="16" fill="#fff"/><path fill="#222" d="M25 6 h5 v4 h-5 Z M35 6 h5 v4 h-5 Z M30 10 h5 v4 h-5 Z M40 10 h5 v4 h-5 Z M25 14 h5 v4 h-5 Z M35 14 h5 v4 h-5 Z M30 18 h5 v4 h-5 Z M40 18 h5 v4 h-5 Z"/></svg>`
+bus:`<svg viewBox="0 0 48 64"><circle cx="24" cy="12" r="10" fill="#ffd94d" opacity=".45"/><path d="M16 60 L20 18 h8 L32 60 Z" fill="#e8e2d4"/><path d="M16 60 L20 18 h4 L22 60 Z" fill="#fff"/><path d="M19 30 h11 M18 42 h13" stroke="#e2544a" stroke-width="5"/><rect x="18" y="10" width="12" height="9" rx="2" fill="#2b3a55"/><circle cx="24" cy="14" r="3.5" fill="#ffd94d"/><path d="M14 8 L20 12 M34 8 L28 12" stroke="#ffd94d" stroke-width="2" stroke-linecap="round"/><path d="M13 60 h22 l-2 4 h-18 Z" fill="#8a5a2b"/></svg>`
 };
 
 const SCENE_BG = {
@@ -591,24 +651,22 @@ had:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
 <rect y="94" width="640" height="6" fill="#61a047"/>
 </svg>`,
 bus:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
-<defs><linearGradient id="skyB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff"/><stop offset="1" stop-color="#e8f2fc"/></linearGradient></defs>
+<defs><linearGradient id="skyB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9fd4ff"/><stop offset="1" stop-color="#dff4ff"/></linearGradient>
+<linearGradient id="lakeB" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb5ee"/><stop offset="1" stop-color="#3a86bd"/></linearGradient></defs>
 <rect width="640" height="140" fill="url(#skyB)"/>
 <circle cx="580" cy="24" r="15" fill="#ffd94d"/>
-<rect x="20" y="40" width="70" height="56" rx="4" fill="#b3c4d8"/>
-<rect x="120" y="26" width="60" height="70" rx="4" fill="#9fb2c8"/>
-<rect x="210" y="48" width="80" height="48" rx="4" fill="#c4d2e2"/>
-<rect x="330" y="32" width="64" height="64" rx="4" fill="#9fb2c8"/>
-<rect x="430" y="50" width="76" height="46" rx="4" fill="#b3c4d8"/>
-<rect x="540" y="38" width="66" height="58" rx="4" fill="#c4d2e2"/>
-<g fill="#ffd94d" opacity=".85">
-<rect x="32" y="50" width="10" height="10" rx="2"/><rect x="56" y="50" width="10" height="10" rx="2"/><rect x="32" y="70" width="10" height="10" rx="2"/>
-<rect x="132" y="38" width="9" height="9" rx="2"/><rect x="152" y="38" width="9" height="9" rx="2"/><rect x="132" y="58" width="9" height="9" rx="2"/><rect x="152" y="58" width="9" height="9" rx="2"/>
-<rect x="344" y="44" width="9" height="9" rx="2"/><rect x="364" y="44" width="9" height="9" rx="2"/><rect x="344" y="64" width="9" height="9" rx="2"/>
-<rect x="554" y="50" width="10" height="10" rx="2"/><rect x="578" y="50" width="10" height="10" rx="2"/>
-</g>
-<rect y="96" width="640" height="44" fill="#8b8f98"/>
-<rect y="96" width="640" height="5" fill="#6f747e"/>
-<path d="M0 120 h640" stroke="#fff" stroke-width="3" stroke-dasharray="18 14" opacity=".65"/>
+<path d="M0 66 L60 30 L130 66 Z" fill="#9fb2c8"/><path d="M60 30 L46 44 L74 44 Z" fill="#fff"/>
+<path d="M90 70 L180 22 L280 70 Z" fill="#8fa8c4"/><path d="M180 22 L160 40 L200 40 Z" fill="#fff"/>
+<path d="M400 68 L480 28 L570 68 Z" fill="#9fb2c8"/><path d="M480 28 L464 42 L496 42 Z" fill="#fff"/>
+<ellipse cx="120" cy="82" rx="130" ry="20" fill="#9fce7d"/>
+<ellipse cx="520" cy="84" rx="160" ry="22" fill="#8cc06a"/>
+<g><ellipse cx="80" cy="74" rx="13" ry="7" fill="#e2544a"/><rect x="76" y="74" width="8" height="9" fill="#f4e8c8"/><ellipse cx="80" cy="74" rx="13" ry="7" fill="none" stroke="#c0392b" stroke-width="1.5"/><circle cx="80" cy="70" r="1.8" fill="#fff"/><rect x="78.5" y="76" width="3" height="5" rx="1.5" fill="#6b4423"/></g>
+<g><ellipse cx="480" cy="76" rx="15" ry="8" fill="#e8a423"/><rect x="475" y="76" width="9" height="10" fill="#f4e8c8"/><ellipse cx="480" cy="76" rx="15" ry="8" fill="none" stroke="#c9861a" stroke-width="1.5"/><circle cx="480" cy="71" r="2" fill="#fff"/><rect x="478" y="78" width="3.5" height="6" rx="1.7" fill="#6b4423"/></g>
+<rect y="88" width="640" height="52" fill="url(#lakeB)"/>
+<path d="M0 88 h640" stroke="#bfe4ff" stroke-width="3" opacity=".8"/>
+<path d="M20 104 q8 -4 16 0 M120 116 q8 -4 16 0 M240 100 q8 -4 16 0 M360 118 q8 -4 16 0 M470 104 q8 -4 16 0 M580 114 q8 -4 16 0" stroke="#bfe4ff" stroke-width="2.5" fill="none" stroke-linecap="round" opacity=".7"/>
+<g fill="#8a5a2b"><rect x="150" y="88" width="34" height="7" rx="2"/><rect x="154" y="93" width="5" height="12"/><rect x="174" y="93" width="5" height="12"/></g>
+<g fill="#8a5a2b"><rect x="380" y="88" width="34" height="7" rx="2"/><rect x="384" y="93" width="5" height="12"/><rect x="404" y="93" width="5" height="12"/></g>
 </svg>`,
 drak:`<svg class="scene-bg" viewBox="0 0 640 140" preserveAspectRatio="none">
 <defs><linearGradient id="skyD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#241f3d"/><stop offset="1" stop-color="#5a4a86"/></linearGradient></defs>
@@ -716,6 +774,7 @@ function playStep(){ tone(440,0,.08,'triangle',.08); tone(554,.1,.1,'triangle',.
 function playFlee(){ tone(880,0,.1); tone(740,.1,.1); tone(587,.2,.1); tone(440,.3,.2); }
 function playWrong(){ tone(196,0,.3,'triangle',.12); }
 function playHit(){ tone(1200,0,.07,'triangle',.1); tone(170,.04,.14,'square',.14); tone(90,.1,.2,'sawtooth',.1); }
+function playMagic(){ tone(523,0,.09,'sine',.1); tone(659,.08,.09,'sine',.1); tone(880,.16,.12,'sine',.1); tone(1175,.24,.28,'sine',.12); }
 function playRoar(){ tone(300,0,.15,'sawtooth',.1); tone(220,.12,.2,'sawtooth',.1); tone(150,.28,.35,'sawtooth',.09); }
 function playClick(){ tone(600,0,.06,'square',.05); }
 function playFanfare(){ tone(523,0,.18); tone(659,.15,.18); tone(784,.3,.18); tone(1047,.45,.5); }
@@ -770,10 +829,10 @@ const INTRO_STORY = [
     text:'V Číselném království zářil kouzelný Křišťál čísel a všechna čísla žila šťastně.',
     stage:CASTLE_SVG },
   { title:'Drak Chaos!',
-    text:'Ale zlý drak Chaos křišťál ukradl a rozbil na tři střepy! Ukryl je na Pyramidové hoře, v Hadím údolí a v Kouzelném autobuse.',
+    text:'Ale zlý drak Chaos křišťál ukradl a rozbil na tři střepy! Ukryl je na Pyramidové hoře, v Hadím údolí a na Skřítčím jezeře — a každý střep hlídají jeho sluhové.',
     stage:DRAGON_SVG },
   { title:'Tvůj úkol, rytíři',
-    text:'Získej v každém světě medaili a najdi všechny tři střepy. Až křišťál složíš, otevře se Dračí věž — a draka porazíš!',
+    text:'Vezmi meč a kouzlo čísel a vydej se na cestu. Poraz drakovy sluhy, získej v každém světě medaili a najdi všechny tři střepy. Až křišťál složíš, otevře se Dračí věž — a draka porazíš!',
     stage:KNIGHT_SVG, btn:'Vyrážím!' }
 ];
 function showStory(panels, onDone){
@@ -818,7 +877,7 @@ function openTower(){
   if (!towerUnlocked()){
     playWrong();
     showPanel('', 'Dračí věž je zamčená',
-      'Věž otevře jen složený Křišťál čísel. Získej medaili 🏅 na Pyramidové hoře, v Hadím údolí i v Kouzelném autobuse — každá medaile je za 10 drahokamů a skrývá jeden střep!',
+      'Věž otevře jen složený Křišťál čísel. Získej medaili 🏅 na Pyramidové hoře, v Hadím údolí i na Skřítčím jezeře — každá medaile je za 10 drahokamů a skrývá jeden střep!',
       'Rozumím', null, false, crystalSVG(shardCount()));
     return;
   }
@@ -826,7 +885,7 @@ function openTower(){
 }
 function showStats(){
   playClick();
-  const names = { pyr:'🏔️ Pyramidová hora', had:'🐍 Hadí údolí', bus:'🚌 Kouzelný autobus' };
+  const names = { pyr:'🏔️ Pyramidová hora', had:'🐍 Hadí údolí', bus:'⛵ Skřítčí jezero' };
   let txt = '';
   for (const w of ['pyr','had','bus']){
     const st = S.stats[w];
@@ -873,39 +932,39 @@ const WORLDS = {
     instruction:'Každá cihla je součtem dvou cihel pod ní. Jaké číslo patří místo otazníku?',
     introEmoji:'🏔️',
     introTitle:'Kapitola 1: Pyramidová hora',
-    intro:'Na vrcholu hory svítí ukradený drahokam! Vyprav se po horské stezce až nahoru. Každý vyřešený úkol tě posune o jeden krok. Ale pozor — cestu hlídá troll!',
+    intro:'Drak Chaos ukryl první střep křišťálu na vrcholu hory a poslal své sluhy, aby stezku hlídali. Každý vyřešený úkol nabije tvůj meč a posune tě o krok výš. Tas meč, rytíři — první tě čeká horský troll!',
     obstacles:{
-      3:{svg:'troll', toast:'Troll utekl!', say:'Troll se lekl tvého počítání a utekl!'},
-      6:{svg:'boulder', toast:'Balvan odvalen!', say:'Kouzlem čísel jsi odvalil obrovský balvan z cesty!'},
-      9:{svg:'eagle', toast:'Orel odletěl!', say:'Dračí orel dostal strach a odletěl pryč!'}
+      3:{svg:'troll', mode:'fight', toast:'Troll sražen!', say:'Máchl jsi mečem a troll odletěl z hory jako míč!'},
+      6:{svg:'boulder', mode:'magic', toast:'Balvan rozbit!', say:'Kouzlo čísel rozbilo obrovský balvan na tisíc kousků!'},
+      9:{svg:'eagle', mode:'fight', toast:'Orel zahnán!', say:'Zasáhl jsi dračího orla plochou meče a ten s krákáním uletěl!'}
     },
-    goalStory:'Vystoupal jsi až na vrchol Pyramidové hory a zachránil drahokam! Získáváš zlatou medaili.'
+    goalStory:'Porazil jsi všechny strážce a vystoupal na vrchol Pyramidové hory! Získáváš zlatou medaili.'
   },
   had: {
     name:'Hadí údolí',
     instruction:'Had počítá od hlavy k ocásku. Jaké číslo patří místo otazníku?',
     introEmoji:'🐍',
     introTitle:'Kapitola 2: Hadí údolí',
-    intro:'Hadí král schoval na konci údolí truhlu plnou drahokamů! Projdi džunglí až k pokladu. Každý vyřešený úkol tě posune o jeden krok. Ale pozor na krokodýla!',
+    intro:'Druhý střep hlídá drakova družina v hlubinách Hadího údolí. Hodný hadí král ti ukáže cestu — jeho hadi počítají za tebe. Každý vyřešený úkol tě posune o krok. Meč připraven? V řece číhá drakův krokodýl!',
     obstacles:{
-      3:{svg:'croc', toast:'Krokodýl zmizel!', say:'Krokodýl se ponořil a uplaval pryč!'},
-      6:{svg:'river', toast:'Řeka přeskočena!', say:'Čísla ti postavila most přes divokou řeku!'},
-      9:{svg:'spider', toast:'Pavouk utekl!', say:'Obří pavouk se schoval do pavučiny strachy!'}
+      3:{svg:'croc', mode:'fight', toast:'Krokodýl odražen!', say:'Tvůj meč zazvonil krokodýlovi o zuby a ten s cáknutím zmizel v řece!'},
+      6:{svg:'river', mode:'magic', toast:'Řeka zkrocena!', say:'Kouzlo čísel zkrotilo divokou řeku a otevřelo ti cestu!'},
+      9:{svg:'spider', mode:'fight', toast:'Pavouk sražen!', say:'Rozťal jsi pavučinu a obří pavouk odletěl do křoví!'}
     },
-    goalStory:'Došel jsi na konec Hadího údolí a našel poklad hadího krále! Získáváš zlatou medaili.'
+    goalStory:'Probojoval ses celým Hadím údolím až k pokladu hadího krále! Získáváš zlatou medaili.'
   },
   bus: {
-    name:'Kouzelný autobus',
-    instruction:'Cestující na zastávkách přistupují (+) a vystupují (−). Jaké číslo patří místo otazníku?',
-    introEmoji:'🚌',
-    introTitle:'Kapitola 3: Kouzelný autobus',
-    intro:'Kouzelný autobus rozváží obyvatele království. Hlídej, kolik cestujících přistupuje a vystupuje, a dovez všechny bezpečně do cíle! Ale pozor — na silnici stojí kráva!',
+    name:'Skřítčí jezero',
+    instruction:'Na každém molu skřítci nastupují (+) a vystupují (−). Jaké číslo patří místo otazníku?',
+    introEmoji:'⛵',
+    introTitle:'Kapitola 3: Skřítčí jezero',
+    intro:'Poslední střep leží v majáku na druhém břehu Skřítčího jezera. Skřítci ti půjčili kouzelnou loďku — na každém molu jich pár nastoupí nebo vystoupí, tak je dobře počítej! Ale pozor, drak poslal do jezera své vodní stvůry!',
     obstacles:{
-      3:{svg:'cow', toast:'Kráva uhnula!', say:'Kráva se lekla a uhnula z cesty!'},
-      6:{svg:'cone', toast:'Opraveno!', say:'Silnice je opravená, můžeš jet dál!'},
-      9:{svg:'light', toast:'Zelená!', say:'Naskočila zelená! Jedeme dál!'}
+      3:{svg:'octo', mode:'fight', toast:'Chobotnice zahnána!', say:'Šlehl jsi mečem a drakova chobotnice žbluňkla ke dnu!'},
+      6:{svg:'whirl', mode:'magic', toast:'Vír zkrocen!', say:'Kouzlo čísel uklidnilo divoký vír a hladina se vyhladila!'},
+      9:{svg:'wdragon', mode:'fight', toast:'Dráče prchá!', say:'Vodní dráče dostalo ránu naplocho a s pískotem se potopilo!'}
     },
-    goalStory:'Dovezl jsi všechny cestující až do cíle! Získáváš zlatou medaili.'
+    goalStory:'Dovezl jsi všechny skřítky bezpečně k majáku na druhém břehu! Získáváš zlatou medaili.'
   },
   drak: {
     name:'Dračí věž',
@@ -961,7 +1020,7 @@ function knightPos(){ return S.gems[currentWorld] % 10; }
 const AMBIENT = {
   pyr:{ch:'❄', n:4, rise:false},
   had:{ch:'🍃', n:3, rise:false},
-  bus:{ch:'', n:0, rise:false},
+  bus:{ch:'💧', n:3, rise:true},
   drak:{ch:'✨', n:4, rise:true}
 };
 function ambientHTML(w){
@@ -995,8 +1054,8 @@ function renderScene(){
       html += '<div class="obstacle a-' + cfg.svg + '" id="ob-' + slot + '" style="left:' + slotLeft(Number(slot)) + '; bottom:' + (SLOT_B[slot]+8) + 'px">' + OBS_SVG[cfg.svg] + '</div>';
     }
   }
-  const heroSvg = w === 'bus' ? BUS_SVG : KNIGHT_SVG;
-  html += '<div class="knight' + (w === 'bus' ? ' as-bus' : '') + '" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + heroSvg + '</div>';
+  const heroSvg = w === 'bus' ? BOAT_SVG : KNIGHT_SVG;
+  html += '<div class="knight' + (w === 'bus' ? ' as-boat' : '') + '" id="knight" style="left:' + slotLeft(pos) + '; bottom:' + (SLOT_B[pos]+10) + 'px">' + heroSvg + '</div>';
   scene.innerHTML = html;
   knightEl = document.getElementById('knight');
   if (knightEl && knightEl.addEventListener){
@@ -1020,16 +1079,66 @@ function moveKnight(pos){
   const cfg = WORLDS[currentWorld].obstacles[pos];
   const ob = obstacleEls[pos];
   if (cfg && ob){
+    setTimeout(() => battleObstacle(cfg, ob, pos), 750);
+    return 1900;
+  }
+  return 0;
+}
+function spawnFx(cls, svg, left, bottomPx, life){
+  const scene = document.getElementById('scene');
+  if (!scene || !scene.appendChild) return null;
+  const el = document.createElement('div');
+  el.className = cls;
+  if (svg) el.innerHTML = svg;
+  el.style.left = left;
+  el.style.bottom = bottomPx + 'px';
+  scene.appendChild(el);
+  if (life) setTimeout(() => { if (el.remove) el.remove(); }, life);
+  return el;
+}
+function shakeScene(){
+  const scene = document.getElementById('scene');
+  if (!scene || !scene.classList) return;
+  scene.classList.remove('shake');
+  void scene.offsetWidth;
+  scene.classList.add('shake');
+  setTimeout(() => scene.classList.remove('shake'), 450);
+}
+function battleObstacle(cfg, ob, pos){
+  const kn = knightEl;
+  if (kn && kn.classList){
+    kn.classList.remove('hop');
+    kn.classList.remove('strike');
+    void kn.offsetWidth;
+    kn.classList.add('strike');
+    setTimeout(() => kn.classList.remove('strike'), 600);
+  }
+  if (cfg.mode === 'magic'){
+    // the knight raises the sword and a number-spell shatters the obstacle
+    playMagic();
+    spawnFx('magic-ring', '', slotLeft(pos), SLOT_B[pos] + 14, 600);
     setTimeout(() => {
-      ob.classList.add('flee');
+      spawnFx('spark', SPARK_SVG, slotLeft(pos), SLOT_B[pos] + 20, 650);
+      if (ob.classList) ob.classList.add('blasted');
+      shakeScene();
+      playHit();
+      toast(cfg.toast);
+      speak(cfg.say);
+    }, 420);
+  } else {
+    // sword slash: the creature is knocked flying off the path
+    setTimeout(() => {
+      spawnFx('slash', SLASH_SVG, slotLeft(pos), SLOT_B[pos] + 24, 520);
+      spawnFx('spark', SPARK_SVG, slotLeft(pos), SLOT_B[pos] + 20, 650);
+      if (ob.classList) ob.classList.add('knocked');
+      shakeScene();
+      playHit();
       playFlee();
       toast(cfg.toast);
       speak(cfg.say);
-      delete obstacleEls[pos];
-    }, 650);
-    return 1100;
+    }, 260);
   }
-  return 0;
+  delete obstacleEls[pos];
 }
 
 /* ---------- dragon boss battle ---------- */
@@ -1130,25 +1239,20 @@ function dragonBreath(){
 function bossHit(){
   inputLocked = true;
   bossHP--;
-  playHit();
   const k = document.getElementById('boss-knight'), d = document.getElementById('boss-dragon');
   if (k && k.classList){ k.classList.remove('attack'); void k.offsetWidth; k.classList.add('attack'); }
+  playStep();
   setTimeout(() => {
-    if (d && d.classList) d.classList.add('hit');
-    const scene = document.getElementById('scene');
-    if (scene && scene.classList){ scene.classList.remove('shake'); scene.classList.add('shake'); setTimeout(() => scene.classList.remove('shake'), 450); }
-    if (scene && scene.appendChild){
-      const sp = document.createElement('div');
-      sp.className = 'spark';
-      sp.innerHTML = SPARK_SVG;
-      scene.appendChild(sp);
-      setTimeout(() => { if (sp.remove) sp.remove(); }, 650);
-    }
+    playHit();
+    spawnFx('slash', SLASH_SVG, '80%', 64, 520);
+    spawnFx('spark', SPARK_SVG, '82%', 58, 650);
+    if (d && d.classList){ d.classList.remove('hit'); void d.offsetWidth; d.classList.add('hit'); }
+    shakeScene();
     renderHpOrbs(true);
-  }, 250);
+  }, 400);
   renderBossHud();
   if (bossHP <= 0){
-    if (d && d.classList) setTimeout(() => d.classList.add('defeated'), 500);
+    if (d && d.classList) setTimeout(() => d.classList.add('defeated'), 900);
     setTimeout(() => {
       S.dragonBeaten = true;
       S.stats.drak.wins = (S.stats.drak.wins || 0) + 1;
@@ -1157,12 +1261,12 @@ function bossHit(){
       showPanel('👑','Drak je poražen!',
         'Rozbil jsi všechna drakova kouzla! Drak Chaos s řevem uletěl a kouzelná čísla jsou navždy v bezpečí. Jsi opravdový Rytíř Čísel!',
         'Hurá!', goMap, true);
-    }, 1700);
+    }, 2100);
   } else {
     if (bossHP <= 4 && d && d.classList) d.classList.add('tired');
     showBubble(TAUNTS[BOSS_MAX - 1 - bossHP] || pick(TAUNTS));
     toast(pick(PRAISE));
-    setTimeout(newTask, 1400);
+    setTimeout(newTask, 1700);
   }
 }
 
@@ -1255,15 +1359,15 @@ function genBus(level){
   const blank = pick(cfg.blank);
   let missIdx, answer, revealPrefix = '', revealSuffix = '';
   if (blank === 'end'){ missIdx = cfg.stops+1; answer = vals[vals.length-1]; }
-  else if (blank === 'start'){ missIdx = 0; answer = vals[0]; revealPrefix = '🚌 '; }
+  else if (blank === 'start'){ missIdx = 0; answer = vals[0]; revealPrefix = '⛵ '; }
   else {
     const oi = randInt(0, cfg.stops-1);
     missIdx = 1+oi; answer = Math.abs(ops[oi]);
-    revealPrefix = (ops[oi] >= 0 ? '+' : '−'); revealSuffix = ' 👤';
+    revealPrefix = (ops[oi] >= 0 ? '+' : '−'); revealSuffix = ' 🧝';
   }
-  const hint = blank === 'end' ? 'Počítej od začátku: na každé zastávce přičti nebo odečti.'
-    : blank === 'start' ? 'Počítej pozpátku od konce jízdy.'
-    : 'Porovnej počet cestujících před zastávkou a po ní.';
+  const hint = blank === 'end' ? 'Počítej od začátku: na každém molu přičti nebo odečti.'
+    : blank === 'start' ? 'Počítej pozpátku od konce plavby.'
+    : 'Porovnej počet skřítků před molem a po něm.';
   return { kind:'bus', vals, ops, missIdx, answer, revealPrefix, revealSuffix, hint };
 }
 
@@ -1323,11 +1427,11 @@ function renderTask(){
       ch.className = 'bus-chip' + (isMissing ? ' missing' : '');
       if (isMissing){
         ch.id = 'miss-slot';
-        ch.textContent = i === 0 ? '🚌 ?' : (i === total-1 ? '?' : (t.ops[i-1] >= 0 ? '+' : '−') + '?');
+        ch.textContent = i === 0 ? '⛵ ?' : (i === total-1 ? '?' : (t.ops[i-1] >= 0 ? '+' : '−') + '?');
       }
-      else if (i === 0) ch.textContent = '🚌 ' + t.vals[0];
+      else if (i === 0) ch.textContent = '⛵ ' + t.vals[0];
       else if (i === total-1) ch.textContent = t.vals[t.vals.length-1];
-      else ch.textContent = (t.ops[i-1] >= 0 ? '+' : '−') + Math.abs(t.ops[i-1]) + ' 👤';
+      else ch.textContent = (t.ops[i-1] >= 0 ? '+' : '−') + Math.abs(t.ops[i-1]) + ' 🧝';
       row.appendChild(stagger(ch));
     }
     area.appendChild(row);
@@ -1452,7 +1556,11 @@ function answer(btn, val){
     }, 1300 + extraDelay);
   } else {
     playWrong();
-    if (w === 'drak') dragonBreath();
+    if (w === 'drak'){
+      dragonBreath();
+      const k = document.getElementById('boss-knight');
+      if (k && k.classList){ k.classList.remove('block'); void k.offsetWidth; k.classList.add('block'); setTimeout(() => k.classList.remove('block'), 950); }
+    }
     btn.classList.add('wrong');
     missesThisTask++;
     if (S.streak[w] !== undefined) S.streak[w] = 0;

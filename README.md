@@ -8,21 +8,22 @@ Výuková matematická hra pro děti (cca 7 let) v češtině, inspirovaná hrou
 ## O hře
 
 Zlý drak Chaos ukradl království kouzelná čísla. Rytíř putuje po stezce ke svému
-cíli — každý vyřešený úkol ho posune o krok dál a zažene překážky (troll, balvan,
-krokodýl…). Za 10 drahokamů je medaile, se dvěma medailemi se otevře Dračí věž.
+cíli — každý vyřešený úkol ho posune o krok dál. Drakovy sluhy na cestě rytíř
+porazí mečem (odletí po zásahu) nebo kouzlem čísel (rozprsknou se v záři).
+Za 10 drahokamů je medaile, se třemi střepy křišťálu se otevře Dračí věž.
 
 ### Příběh
 
-Drak Chaos rozbil Křišťál čísel na tři střepy a ukryl je ve třech světech.
-První medaile v každém světě odhalí jeden střep — složený křišťál otevře
-Dračí věž a souboj s drakem.
+Drak Chaos rozbil Křišťál čísel na tři střepy, ukryl je ve třech světech
+a každý střep nechal hlídat svými sluhy. První medaile v každém světě
+odhalí jeden střep — složený křišťál otevře Dračí věž a souboj s drakem.
 
 ### Světy
 
-- **🏔️ Pyramidová hora** — součtové trojúhelníky (každá cihla je součtem dvou cihel pod ní)
-- **🐍 Hadí údolí** — číselní hadi (počítání po krocích +/−)
-- **🚌 Kouzelný autobus** — Hejného prostředí autobus: cestující přistupují a vystupují
-- **🏰 Dračí věž** — souboj s drakem: rozbíjení kouzel (rovnice s chybějícím číslem nebo znaménkem)
+- **🏔️ Pyramidová hora** — součtové trojúhelníky (každá cihla je součtem dvou cihel pod ní); stezku hlídá troll, balvan a dračí orel
+- **🐍 Hadí údolí** — číselní hadi (počítání po krocích +/−); v cestě číhá krokodýl, divoká řeka a obří pavouk
+- **⛵ Skřítčí jezero** — plavba kouzelnou loďkou (Hejného prostředí autobus v pohádkovém kabátě): skřítci na molech nastupují a vystupují; v jezeře číhá chobotnice, vír a vodní dráče
+- **🏰 Dračí věž** — souboj s drakem: rytíř se rozběhne a mečem rozbíjí kouzla (rovnice s chybějícím číslem nebo znaménkem), při chybě se kryje štítem před dračím ohněm
 
 ### Pro rodiče
 
